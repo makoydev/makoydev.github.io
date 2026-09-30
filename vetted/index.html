@@ -315,7 +315,7 @@ section { padding-block: 72px 0; display: grid; gap: 28px; }
 /* ---------- Timeline ---------- */
 .tl { position: relative; height: 56px; margin-inline: 8px; }
 .tl .rail { position: absolute; left: 0; right: 0; top: 30px; height: 4px; border-radius: 2px; background: var(--line); }
-.tl .done { position: absolute; left: 0; top: 30px; height: 4px; width: 2.9%; border-radius: 2px; background: var(--accent); }
+.tl .done { position: absolute; left: 0; top: 30px; height: 4px; width: 4.3%; border-radius: 2px; background: var(--accent); }
 .tl .mk { position: absolute; top: 0; transform: translateX(-50%); display: grid; justify-items: center; gap: 6px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; }
 .tl .mk::after { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--card); border: 3px solid var(--ink); }
 .tl .mk.today { color: var(--accent); }
@@ -380,7 +380,7 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
   <header class="hero">
     <div class="hero-top">
       <span class="eyebrow">AI Governance Toolkit · Project 1 of 2</span>
-      <span class="status-chip"><span class="dot"></span>30 Sep 2026 · milestone 1 built, in review</span>
+      <span class="status-chip"><span class="dot"></span>1 Oct 2026 · milestone 1 released</span>
     </div>
     <div class="hero-grid">
       <div style="display:grid;gap:22px">
@@ -678,9 +678,9 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
       <h2 id="tl-h">Where things stand</h2>
       <p class="lead prose">Ten weeks, three milestones, about 8 to 10 hours a week. The line below is drawn to scale.</p>
     </div>
-    <div class="tl" role="img" aria-label="Timeline from 28 September to 6 December 2026. Today, 30 September, is near the start: milestone 1 has been built early and is waiting for review. M1 due 25 October, M2 22 November, M3 6 December.">
+    <div class="tl" role="img" aria-label="Timeline from 28 September to 6 December 2026. Today, 1 October, is near the start: milestone 1 was released early, on 1 October. M1 was due 25 October, M2 is due 22 November, M3 6 December.">
       <div class="rail"></div><div class="done"></div>
-      <span class="mk today" style="left:2.9%">TODAY</span>
+      <span class="mk today" style="left:4.3%">TODAY</span>
       <span class="mk" style="left:39.1%">M1</span>
       <span class="mk" style="left:79.7%">M2</span>
       <span class="mk" style="left:100%">M3</span>
@@ -697,18 +697,19 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
           <li><span class="mark ok">✓</span><span>Plan for milestone 1 written and approved</span></li>
           <li><span class="mark ok">✓</span><span>All 9 milestone-1 tasks built: the Singapore personal-data rulebook, the checks before anything is sent, the AI connection with its spending cap, labelled comments, audit records and the canary tests</span></li>
           <li><span class="mark ok">✓</span><span>The pilot has started: Vetted reviewed the first change in <a href="https://github.com/makoydev/discreet">Discreet</a></span></li>
+          <li><span class="mark ok">✓</span><span>Reviewed by a person and released on 1 October: <a href="https://github.com/makoydev/vetted/releases/tag/v0.1.0">Vetted v0.1.0</a> and <a href="https://github.com/makoydev/sg-pii-rules/releases/tag/v0.1.0">sg-pii-rules v0.1.0</a> (<a href="m1-review/">decision report</a>)</span></li>
         </ul>
       </div>
       <div>
         <h3 style="color:var(--amber)">In progress</h3>
         <ul class="checklist">
-          <li><span class="mark wip">…</span><span>A person is reviewing all of milestone 1 before it is released (<a href="m1-review/">decision report</a>)</span></li>
+          <li><span class="mark wip">…</span><span>The Discreet pilot runs in watch-only mode, recording what the AI would say without commenting</span></li>
         </ul>
       </div>
       <div>
         <h3 style="color:var(--muted)">Up next</h3>
         <ul class="checklist">
-          <li><span class="mark next">·</span><span>Release v0.1.0, once reviewed</span></li>
+          <li><span class="mark next">·</span><span>14 October: the pilot starts commenting when asked (opt-in)</span></li>
           <li><span class="mark next">·</span><span>Milestone 2: building Discreet, the privacy gateway</span></li>
         </ul>
       </div>
