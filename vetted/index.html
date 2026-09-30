@@ -315,7 +315,7 @@ section { padding-block: 72px 0; display: grid; gap: 28px; }
 /* ---------- Timeline ---------- */
 .tl { position: relative; height: 56px; margin-inline: 8px; }
 .tl .rail { position: absolute; left: 0; right: 0; top: 30px; height: 4px; border-radius: 2px; background: var(--line); }
-.tl .done { position: absolute; left: 0; top: 30px; height: 4px; width: 2%; border-radius: 2px; background: var(--accent); }
+.tl .done { position: absolute; left: 0; top: 30px; height: 4px; width: 2.9%; border-radius: 2px; background: var(--accent); }
 .tl .mk { position: absolute; top: 0; transform: translateX(-50%); display: grid; justify-items: center; gap: 6px; font-family: var(--mono); font-size: 11.5px; font-weight: 600; }
 .tl .mk::after { content: ""; width: 14px; height: 14px; border-radius: 50%; background: var(--card); border: 3px solid var(--ink); }
 .tl .mk.today { color: var(--accent); }
@@ -380,7 +380,7 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
   <header class="hero">
     <div class="hero-top">
       <span class="eyebrow">AI Governance Toolkit · Project 1 of 2</span>
-      <span class="status-chip"><span class="dot"></span>28 Sep 2026 · setting up</span>
+      <span class="status-chip"><span class="dot"></span>30 Sep 2026 · milestone 1 built, in review</span>
     </div>
     <div class="hero-grid">
       <div style="display:grid;gap:22px">
@@ -678,9 +678,9 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
       <h2 id="tl-h">Where things stand</h2>
       <p class="lead prose">Ten weeks, three milestones, about 8 to 10 hours a week. The line below is drawn to scale.</p>
     </div>
-    <div class="tl" role="img" aria-label="Timeline from 28 September to 6 December 2026. Today is at the start. M1 on 25 October, M2 on 22 November, M3 on 6 December.">
+    <div class="tl" role="img" aria-label="Timeline from 28 September to 6 December 2026. Today, 30 September, is near the start: milestone 1 has been built early and is waiting for review. M1 due 25 October, M2 22 November, M3 6 December.">
       <div class="rail"></div><div class="done"></div>
-      <span class="mk today" style="left:0%">TODAY</span>
+      <span class="mk today" style="left:2.9%">TODAY</span>
       <span class="mk" style="left:39.1%">M1</span>
       <span class="mk" style="left:79.7%">M2</span>
       <span class="mk" style="left:100%">M3</span>
@@ -695,25 +695,25 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
         <h3 style="color:var(--accent)">Done</h3>
         <ul class="checklist">
           <li><span class="mark ok">✓</span><span>Plan for milestone 1 written and approved</span></li>
-          <li><span class="mark ok">✓</span><span>Public code home created: <a href="https://github.com/makoydev/vetted">github.com/makoydev/vetted</a></span></li>
-          <li><span class="mark ok">✓</span><span>9 tasks on a <a href="https://github.com/users/makoydev/projects/1">public progress board</a></span></li>
+          <li><span class="mark ok">✓</span><span>All 9 milestone-1 tasks built: the Singapore personal-data rulebook, the checks before anything is sent, the AI connection with its spending cap, labelled comments, audit records and the canary tests</span></li>
+          <li><span class="mark ok">✓</span><span>The pilot has started: Vetted reviewed the first change in <a href="https://github.com/makoydev/discreet">Discreet</a></span></li>
         </ul>
       </div>
       <div>
         <h3 style="color:var(--amber)">In progress</h3>
         <ul class="checklist">
-          <li><span class="mark wip">…</span><span>Setting up the codebase and its automatic checks (task 1)</span></li>
+          <li><span class="mark wip">…</span><span>A person is reviewing all of milestone 1 before it is released (<a href="m1-review/">decision report</a>)</span></li>
         </ul>
       </div>
       <div>
         <h3 style="color:var(--muted)">Up next</h3>
         <ul class="checklist">
-          <li><span class="mark next">·</span><span>The shared Singapore personal-data rulebook (task 2)</span></li>
-          <li><span class="mark next">·</span><span>Deciding when Vetted runs, and fetching changes (task 3)</span></li>
+          <li><span class="mark next">·</span><span>Release v0.1.0, once reviewed</span></li>
+          <li><span class="mark next">·</span><span>Milestone 2: building Discreet, the privacy gateway</span></li>
         </ul>
       </div>
     </div>
-    <p class="note">No results yet. Accuracy, cost per review and how often people accept the AI's comments will be published here as they are measured, together with how many cases they are based on.</p>
+    <p class="note">First results, from tests with fake data: no leaks in 144 test values, and nothing missed compared with the industry-standard secret scanner on its own 3,658 test cases. Results with a real AI (accuracy, cost per review, how often people accept its comments) come next, with how many cases they are based on.</p>
   </section>
 
   <!-- HOW IT'S RUN -->
@@ -725,7 +725,7 @@ footer { padding-top: 64px; display: flex; flex-wrap: wrap; gap: 12px 28px; font
     <div class="rules">
       <div class="rule">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><circle cx="16" cy="11" r="5" stroke="var(--ink)" stroke-width="2"/><path d="M6 28c1.5-5.5 5.5-8 10-8s8.5 2.5 10 8" stroke="var(--ink)" stroke-width="2" stroke-linecap="round"/><path d="m20 25 3 3 6-7" stroke="var(--accent)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div><h3>A person approves every change</h3><p>Nothing goes into the project without a human reviewing it first. The code host enforces this, so there is no way round it.</p></div>
+        <div><h3>A person approves everything before release</h3><p>Every change is checked automatically. Since 30 September the AI may merge checked work into a staging area, but nothing reaches the main version or a release until a person has reviewed it. The code host enforces that.</p></div>
       </div>
       <div class="rule">
         <svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><rect x="7" y="4" width="18" height="24" rx="2" stroke="var(--ink)" stroke-width="2"/><path d="M11 11h10M11 16h10M11 21h6" stroke="var(--accent)" stroke-width="2" stroke-linecap="round"/></svg>

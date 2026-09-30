@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Milestone 1 of the AI Governance Toolkit: what was built, the decisions behind it, the evidence, and what to review before it reaches main.">
+<title>Milestone 1 Review</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #eef1f3;
+  --card: #f9fbfc;
+  --ink: #15212a;
+  --muted: #56646e;
+  --faint: #7d8a92;
+  --line: #cad3d9;
+  --hairline: #e1e6e9;
+  --accent: #0b7a66;
+  --accent-soft: #d5ece6;
+  --amber: #a86400;
+  --amber-soft: #fbe9cc;
+  --ai: #2d58cc;
+  --ai-soft: #dde5fa;
+  --no: #b3261e;
+  --no-soft: #f7dcda;
+  --code-bg: #ffffff;
+  --shadow: 0 1px 2px rgba(21, 33, 42, .06), 0 8px 24px rgba(21, 33, 42, .07);
+  /* Chart roles (validated: dataviz reference slots 1-3 on #f9fbfc) */
+  --series-1: #2a78d6;
+  --series-2: #eb6834;
+  --series-3: #1baf7a;
+  --grid: #e1e6e9;
+  --axis: #b9c4cb;
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "Public Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0e1418;
+    --card: #152027;
+    --ink: #e3e9ed;
+    --muted: #96a4ad;
+    --faint: #75848d;
+    --line: #283740;
+    --hairline: #22303a;
+    --accent: #45c4a8;
+    --accent-soft: #123a33;
+    --amber: #eaa643;
+    --amber-soft: #3a2a10;
+    --ai: #88a4f7;
+    --ai-soft: #1c2748;
+    --no: #f08a82;
+    --no-soft: #3d1b19;
+    --code-bg: #10191e;
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --grid: #22303a;
+    --axis: #3a4a54;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e1418;
+  --card: #152027;
+  --ink: #e3e9ed;
+  --muted: #96a4ad;
+  --faint: #75848d;
+  --line: #283740;
+  --hairline: #22303a;
+  --accent: #45c4a8;
+  --accent-soft: #123a33;
+  --amber: #eaa643;
+  --amber-soft: #3a2a10;
+  --ai: #88a4f7;
+  --ai-soft: #1c2748;
+  --no: #f08a82;
+  --no-soft: #3d1b19;
+  --code-bg: #10191e;
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 8px 24px rgba(0, 0, 0, .35);
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --grid: #22303a;
+  --axis: #3a4a54;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; animation: none !important; } }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-underline-offset: 3px; }
+a:hover { text-decoration-thickness: 2px; }
+code, .mono { font-family: var(--mono); font-size: .88em; }
+code { background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 5px; padding: 0 .3em; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 720px) { .wrap { padding: 0 28px; } }
+
+/* Header */
+header.top { padding: 40px 0 8px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: center; justify-content: space-between; }
+.theme-toggle { font: inherit; font-size: 12px; letter-spacing: .08em; color: var(--muted); background: var(--card); border: 1px solid var(--line); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.theme-toggle:hover { color: var(--ink); }
+h1 { font-family: var(--display); font-stretch: 85%; font-weight: 850; font-size: clamp(40px, 8vw, 84px); line-height: .95; letter-spacing: -.02em; margin: 18px 0 14px; }
+h1 .dot { color: var(--accent); }
+.lede { font-size: clamp(18px, 2.4vw, 22px); line-height: 1.45; max-width: 780px; margin: 0 0 10px; }
+.lede strong { color: var(--accent); }
+.status { display: inline-flex; gap: 8px; align-items: center; background: var(--amber-soft); color: var(--ink); border-radius: 999px; padding: 6px 14px; font-size: 14px; margin-top: 8px; }
+.status::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--amber); }
+
+/* Nav */
+nav.jump { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--paper) 92%, transparent); backdrop-filter: blur(6px); border-bottom: 1px solid var(--line); margin-top: 22px; }
+nav.jump .wrap { display: flex; gap: 4px 18px; overflow-x: auto; padding-top: 10px; padding-bottom: 10px; scrollbar-width: none; }
+nav.jump a { white-space: nowrap; color: var(--muted); text-decoration: none; font-size: 14px; font-weight: 600; }
+nav.jump a:hover, nav.jump a:focus-visible { color: var(--ink); }
+
+section { padding: 44px 0 8px; }
+.kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--accent); margin: 0 0 6px; }
+h2 { font-family: var(--display); font-stretch: 90%; font-weight: 800; font-size: clamp(28px, 4.4vw, 42px); line-height: 1.05; letter-spacing: -.01em; margin: 0 0 12px; }
+h3 { font-size: 18px; margin: 0 0 6px; line-height: 1.3; }
+p { margin: 0 0 12px; }
+.sub { color: var(--muted); max-width: 760px; }
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: var(--shadow); padding: 20px; }
+.grid { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); }
+/* Items may shrink below their content's width, so a chart can't widen the page. */
+.grid > * { min-width: 0; }
+@media (min-width: 720px) { .g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+
+/* KPI row */
+.kpis { display: grid; gap: 12px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 26px; }
+@media (min-width: 720px) { .kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (min-width: 1000px) { .kpis { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
+.kpi { background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 14px 12px; }
+.kpi .label { font-size: 13px; color: var(--muted); line-height: 1.3; }
+.kpi .value { font-family: var(--body); font-weight: 700; font-size: 30px; line-height: 1.1; margin: 6px 0 2px; }
+.kpi .note { font-size: 12.5px; color: var(--muted); line-height: 1.35; }
+
+/* Checklist */
+ol.steps { list-style: none; padding: 0; margin: 0; counter-reset: step; display: grid; gap: 10px; }
+ol.steps li { counter-increment: step; display: grid; grid-template-columns: 36px 1fr; gap: 12px; align-items: start; background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; padding: 14px 16px; }
+ol.steps li::before { content: counter(step); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+ol.steps li.you::before { background: var(--amber-soft); color: var(--amber); }
+.tag { display: inline-block; font-size: 11.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 6px; padding: 1px 7px; vertical-align: 2px; margin-left: 6px; }
+.tag.you { background: var(--amber-soft); color: var(--amber); }
+.tag.claude { background: var(--accent-soft); color: var(--accent); }
+.tag.opt { background: var(--hairline); color: var(--muted); }
+
+/* Callout */
+.callout { border-left: 4px solid var(--amber); background: var(--amber-soft); border-radius: 0 12px 12px 0; padding: 14px 18px; }
+.callout.ok { border-left-color: var(--accent); background: var(--accent-soft); }
+
+/* Pipeline */
+.pipeline { display: grid; gap: 10px; counter-reset: pipe; }
+.pipe { background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; }
+.pipe summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: 40px 1fr auto; gap: 12px; align-items: center; padding: 14px 16px; }
+.pipe summary::-webkit-details-marker { display: none; }
+.pipe .num { font-family: var(--mono); font-weight: 600; color: var(--accent); font-size: 14px; }
+.pipe .what { font-weight: 700; }
+.pipe .what small { display: block; font-weight: 400; color: var(--muted); font-size: 14px; }
+.pipe .chev { color: var(--muted); transition: transform .2s; }
+.pipe[open] .chev { transform: rotate(90deg); }
+.pipe .body { padding: 0 16px 16px 68px; }
+@media (max-width: 560px) { .pipe .body { padding-left: 16px; } }
+.pipe .why { border-top: 1px solid var(--hairline); padding-top: 12px; }
+.pipe .ev { font-size: 14px; color: var(--muted); }
+
+/* Decisions */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+.chip { font: inherit; font-size: 14px; border: 1px solid var(--line); background: var(--card); color: var(--muted); border-radius: 999px; padding: 5px 12px; cursor: pointer; }
+.chip[aria-pressed="true"] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.adr { background: var(--card); border: 1px solid var(--hairline); border-radius: 12px; margin-bottom: 8px; }
+.adr summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: center; padding: 12px 16px; }
+.adr summary::-webkit-details-marker { display: none; }
+.adr .id { font-family: var(--mono); font-size: 13px; color: var(--muted); white-space: nowrap; }
+.adr .title { font-weight: 650; line-height: 1.35; }
+.badge { font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; white-space: nowrap; }
+.badge.acc { background: var(--accent-soft); color: var(--accent); }
+.badge.draft { background: var(--amber-soft); color: var(--amber); }
+.badge.mine { background: var(--ai-soft); color: var(--ai); }
+.adr .body { padding: 0 16px 14px; display: grid; gap: 8px; }
+@media (max-width: 560px) {
+  .adr summary { grid-template-columns: 1fr auto; row-gap: 4px; }
+  .adr .title { grid-column: 1 / -1; grid-row: 2; }
+}
+@media (min-width: 720px) { .adr .body { grid-template-columns: 1fr 1fr; } }
+.adr dl { margin: 0; }
+.adr dt { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+.adr dd { margin: 2px 0 0; }
+
+/* Charts */
+.chart-card { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; padding: 18px 18px 12px; position: relative; }
+.chart-title { font-weight: 700; margin: 0 0 2px; }
+.chart-sub { color: var(--muted); font-size: 14px; margin: 0 0 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 6px 16px; font-size: 13.5px; color: var(--muted); margin: 0 0 6px; }
+.legend span { display: inline-flex; align-items: center; gap: 7px; }
+.legend i { width: 16px; height: 2px; border-radius: 2px; display: inline-block; }
+svg.chart { display: block; overflow: visible; max-width: 100%; }
+svg.chart text { font-family: var(--body); fill: var(--muted); font-size: 12px; }
+svg.chart .strong { fill: var(--ink); font-weight: 600; }
+svg.chart .hit { fill: transparent; cursor: default; }
+svg.chart .hit:focus { outline: none; }
+svg.chart .hit:focus-visible { stroke: var(--ink); stroke-width: 1; }
+.tip { position: absolute; pointer-events: none; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 8px 10px; font-size: 13px; line-height: 1.35; box-shadow: var(--shadow); opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; z-index: 3; min-width: 150px; }
+.tip.show { opacity: 1; transform: none; }
+.tip .row { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+.tip .row b { font-weight: 700; }
+.tip .row .k { display: inline-flex; align-items: center; gap: 6px; opacity: .85; }
+.tip .row .k i { width: 12px; height: 2px; border-radius: 2px; display: inline-block; }
+.tip .head { font-size: 12px; opacity: .75; margin-bottom: 4px; }
+details.tableview { margin-top: 8px; font-size: 14px; }
+details.tableview summary { cursor: pointer; color: var(--muted); }
+.tbl { width: 100%; overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--hairline); vertical-align: top; }
+th { font-size: 12.5px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; }
+
+/* Meter */
+.meter { height: 14px; background: var(--accent-soft); border-radius: 999px; overflow: hidden; margin: 10px 0 6px; }
+.meter > span { display: block; height: 100%; background: var(--accent); border-radius: 999px 4px 4px 999px; }
+.meter-scale { display: flex; justify-content: space-between; font-size: 12.5px; color: var(--muted); }
+
+/* Mistakes */
+.mistake { display: grid; grid-template-columns: 1fr; gap: 6px; padding: 14px 0; border-bottom: 1px solid var(--hairline); }
+@media (min-width: 720px) { .mistake { grid-template-columns: 1.3fr 1fr 1fr; gap: 18px; } }
+.mistake .lab { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); display: block; }
+.mistake .repo { font-family: var(--mono); font-size: 12px; color: var(--faint); }
+
+/* Lists */
+ul.clean { padding-left: 18px; margin: 0; }
+ul.clean li { margin: 4px 0; }
+.frameworks { display: flex; flex-wrap: wrap; gap: 8px; }
+.fw { background: var(--card); border: 1px solid var(--hairline); border-radius: 10px; padding: 8px 12px; font-size: 14px; }
+.fw b { display: block; font-size: 13px; }
+.fw span { color: var(--muted); font-size: 13px; }
+.crib li { margin: 10px 0; }
+footer { color: var(--muted); font-size: 14px; padding: 36px 0 60px; border-top: 1px solid var(--line); margin-top: 44px; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>AI Governance Toolkit · Milestone 1 · decision report</span>
+      <button class="theme-toggle" type="button" id="themeToggle" aria-label="Switch colour theme">Theme</button>
+    </div>
+    <h1>Built. Now it's<br>your call<span class="dot">.</span></h1>
+    <p class="lede">Milestone 1 was due on 25 October. It was built on 30 September, in autonomous mode: <strong>Vetted v0.1.0</strong>, the <strong>sg-pii-rules</strong> it depends on, and the start of the <strong>Discreet</strong> pilot. Every change passed CI, and none of it has been reviewed by a human yet. This page explains what was built, why each decision was made, what the evidence shows, and what's waiting for you.</p>
+    <span class="status">Waiting for your review · 30 Sep 2026</span>
+
+    <div class="kpis" role="list">
+      <div class="kpi" role="listitem"><div class="label">Leaks in the canary suite</div><div class="value">0</div><div class="note">144 fake secrets and IDs, 34 runs, 4 output channels</div></div>
+      <div class="kpi" role="listitem"><div class="label">Secrets missed vs gitleaks</div><div class="value">0</div><div class="note">on 3,658 of gitleaks' own test cases</div></div>
+      <div class="kpi" role="listitem"><div class="label">Worst-case cost per review</div><div class="value">$0.0104</div><div class="note">a hard bound; ≤ $0.20 a day per repo</div></div>
+      <div class="kpi" role="listitem"><div class="label">Automated tests</div><div class="value">687</div><div class="note">442 in Vetted, 245 in sg-pii-rules</div></div>
+      <div class="kpi" role="listitem"><div class="label">Decision records</div><div class="value">20</div><div class="note">16 accepted by you, 4 drafted and waiting</div></div>
+      <div class="kpi" role="listitem"><div class="label">Pull requests merged</div><div class="value">22</div><div class="note">5 by you, 17 by Claude Code into <code>next</code></div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="jump" aria-label="Sections">
+  <div class="wrap">
+    <a href="#review">Your review</a>
+    <a href="#how">How we worked</a>
+    <a href="#pipeline">What Vetted does</a>
+    <a href="#decisions">Decisions</a>
+    <a href="#evidence">Evidence</a>
+    <a href="#mistakes">What went wrong</a>
+    <a href="#next">Not done yet</a>
+    <a href="#risks">Risks</a>
+    <a href="#frameworks">Frameworks</a>
+    <a href="#interview">Interview crib</a>
+  </div>
+</nav>
+
+<main>
+<section id="review">
+  <div class="wrap">
+    <p class="kicker">Your part</p>
+    <h2>A 30-minute review</h2>
+    <p class="sub">Nothing reaches <code>main</code> or a release until you merge it. That's the point of the integration branch (ADR 0009). Here's the order I'd do it in.</p>
+    <ol class="steps">
+      <li class="you"><div><h3>Read this page <span class="tag you">you</span></h3><p>About 15 minutes. The <a href="#decisions">decisions</a> and <a href="#mistakes">what went wrong</a> sections matter most.</p></div></li>
+      <li class="you"><div><h3>Review the four drafted decisions <span class="tag you">you</span></h3><p>Vetted <a href="https://github.com/makoydev/vetted/blob/next/docs/adr/0010-secret-scrubbing-deviations.md">ADR 0010</a> (five places Vetted is stricter than gitleaks), <a href="https://github.com/makoydev/vetted/blob/next/docs/adr/0011-model-client-and-fail-closed-choice.md">0011</a> (plain-fetch client, fail closed), <a href="https://github.com/makoydev/vetted/blob/next/docs/adr/0012-what-vetted-posts.md">0012</a> (what gets posted, when), and sg-pii-rules <a href="https://github.com/makoydev/sg-pii-rules/blob/next/docs/adr/0007-phone-and-email-by-shape.md">ADR 0007</a> (phone and email matched by shape). Reply "approve", or say what to change.</p></div></li>
+      <li class="you"><div><h3>Merge the three review pull requests with <em>Rebase and merge</em> <span class="tag you">you</span></h3><p><a href="https://github.com/makoydev/vetted/pull/25">vetted#25</a>, <a href="https://github.com/makoydev/sg-pii-rules/pull/9">sg-pii-rules#9</a>, <a href="https://github.com/makoydev/discreet/pull/2">discreet#2</a>. Rebase (not squash) keeps each change as its own commit on <code>main</code>. Also merge the pull request that publishes this page on makoydev.github.io.</p></div></li>
+      <li><div><h3>Say "merged" <span class="tag claude">Claude Code</span></h3><p>Then I tag <code>v0.1.0</code> on <code>main</code>: sg-pii-rules first (byte-identical to the release candidate Vetted already vendors), then Vetted. I also publish the GitHub Releases, move Discreet's pin to the release, and close the milestone.</p></div></li>
+      <li class="you"><div><h3>Optional: switch on the real model <span class="tag opt">optional</span></h3><p>Create an OpenAI project with a monthly spend limit, then in <em>your own terminal</em> (not in a chat): <code>gh secret set OPENAI_API_KEY -R makoydev/vetted</code>, and the same for <code>makoydev/discreet</code>. Until then everything runs on the free mock, and the evidence says so.</p></div></li>
+      <li><div><h3>14 October: Discreet goes from shadow to opt-in <span class="tag claude">Claude Code</span></h3><p>Two weeks of shadow mode, as the brief planned. The switch is a one-line pull request.</p></div></li>
+    </ol>
+  </div>
+</section>
+
+<section id="how">
+  <div class="wrap">
+    <p class="kicker">How we worked</p>
+    <h2>One change you made to the rules</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>Before 30 September</h3>
+        <p>Claude Code drafted each change as a pull request. <strong>You reviewed and merged every one</strong>, and answered decision questions as they came up. You merged 5 pull requests this way, and changed two of my proposals: the model (GPT-6 Luna instead of gpt-5-nano) and the NRIC look-alike detector (build it now).</p>
+      </div>
+      <div class="card">
+        <h3>From 30 September (ADR 0009)</h3>
+        <p>You asked me to work through without waiting. You chose the <strong>integration branch</strong> option: each change still got its own pull request and full CI, and I merged it into a protected <code>next</code> branch labelled <code>ai-merged</code>. <strong>17 pull requests</strong> went through that way. <code>main</code> never changed.</p>
+      </div>
+    </div>
+    <p class="callout" style="margin-top:14px"><strong>Why this matters for the portfolio:</strong> merges I make appear on GitHub as made by you, because I act through your account. The <code>ai-merged</code> label, the build log and ADR 0009 keep the record honest: they show what was automated, what gated it (tests, the canary suite, CodeQL), and that a human reviews the batch before anything ships.</p>
+  </div>
+</section>
+
+<section id="pipeline">
+  <div class="wrap">
+    <p class="kicker">What Vetted does</p>
+    <h2>Eight steps on every pull request</h2>
+    <p class="sub">Open a step to see why it exists and where its evidence is.</p>
+    <div class="pipeline">
+      <details class="pipe"><summary><span class="num">01</span><span class="what">Gate the run<small>Shadow mode reviews everything but only writes an audit record; opt-in reviews labelled pull requests and comments; forks get the free mock</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> a team can watch what the AI would say before letting it say anything. That's the gradual rollout IMDA's frameworks describe. Only <code>pull_request</code> events are accepted: <code>pull_request_target</code> would hand secrets to fork code.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/15">#15</a>, a 9-row test table of mode × label × fork × key. Config is read from the <em>base</em> commit, so a pull request can't weaken its own review (ADR 0007).</p></div></div></details>
+      <details class="pipe"><summary><span class="num">02</span><span class="what">Keep sensitive files out<small>.env files, keys, credential files, lockfiles, generated code and binaries are never sent; oversized files are skipped whole and listed</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> the cheapest leak to prevent is a file that never leaves. The deny list is a floor: a team's config can add to it but can never re-allow a <code>.env</code>. Files are never cut in half, because a truncated file would be reviewed as if it were complete.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/16">#16</a>. A canary that only the deny list can stop leaks when the deny list is removed.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">03</span><span class="what">Scrub secrets<small>gitleaks' 221 rules run with a linear-time regex engine, plus an entropy check for secrets no rule names</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> using the industry's standard rule set is easy to defend, and proving the port faithful is what makes it credible: <strong>0 misses</strong> against the real gitleaks binary. Where gitleaks would let a secret through (for example by honouring an "allow" comment written by the same person whose secret it is), Vetted is deliberately stricter.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/17">#17</a>, ADR 0010, the <a href="#parity">parity table</a> and the <a href="#entropy">entropy calibration</a>.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">04</span><span class="what">Scrub Singapore personal data<small>NRIC/FIN (including mistyped ones), phone numbers and emails become &lt;NRIC&gt;, &lt;PHONE&gt;, &lt;EMAIL&gt;</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> PDPC's guidance treats NRIC numbers as especially sensitive, and sending them to an overseas AI provider is a transfer out of Singapore. The rules live in their own repository with checksummed releases, and Vetted's implementation passes <strong>184 / 184</strong> shared test cases, the same ones Discreet's Go version will have to pass.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/18">#18</a>, <a href="https://github.com/makoydev/sg-pii-rules/releases/tag/v0.1.0-rc.1">sg-pii-rules v0.1.0-rc.1</a>. <a href="https://github.com/makoydev/sg-pii-rules/blob/next/VALIDATORS.md">VALIDATORS.md</a> says plainly that the NRIC checksum was never officially published.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">05</span><span class="what">Check the budget<small>Each review has a hard worst-case cost; today's worst case must fit the daily budget, or the free mock is used</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> the brief caps spend. Measuring spend after the fact can't stop a runaway, but a bound computed from hard caps can. Diff size is capped in bytes, and a token is never smaller than a byte, so the input cost has a true ceiling. Anything uncertain, such as an unknown model price, falls back to the mock.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/19">#19</a>, ADR 0004, ADR 0011, and the <a href="#cost">cost bound</a> below.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">06</span><span class="what">Ask the model, safely<small>The diff is wrapped in markers with a random nonce and labelled untrusted; no tools; strict JSON schema; <code>store: false</code></small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> prompt injection is OWASP's number one LLM risk. The model is told the diff is data, not instructions, and an attacker can't fake the end of the data block without guessing 64 random bits. The client refuses to exist inside the test suite with real network access, so tests can never spend money.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/19">#19</a>, <code>src/model/prompt.ts</code>, <code>src/model/openai.ts</code>.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">07</span><span class="what">Validate, detect, and comment<small>Invalid output is discarded; injection attempts are reported by rules; comments are tagged [AI], always posted as COMMENT</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> the model's output is untrusted too. Links and images are removed before posting, because a rendered image URL is a known way to leak data out of an AI system. Injection findings are posted even when the model's output is unusable, so breaking the model can't also hide the attack. There's no code path that approves or requests changes, and a test checks for it.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/20">#20</a>, ADR 0012. CodeQL caught my first HTML sanitiser, which could be bypassed; it's fixed and has a test.</p></div></div></details>
+      <details class="pipe"><summary><span class="num">08</span><span class="what">Leave an audit record<small>Every run, including skipped and failed ones: prompt hash, model, tokens, cost, budget, scrub counts; never code</small></span><span class="chev" aria-hidden="true">›</span></summary><div class="body"><div class="why"><p><strong>Why it matters:</strong> governance needs evidence of what happened, and the evidence mustn't become a leak itself. The record has hashes and counts only, is checked against a schema, and is uploaded as a workflow artifact kept for 30 days. It's the data Milestone 3's dashboard will be built on.</p><p class="ev">Evidence: <a href="https://github.com/makoydev/vetted/pull/21">#21</a>. Real records: <a href="https://github.com/makoydev/vetted/actions/runs/36697544953">Vetted reviewing its own #21</a> and <a href="https://github.com/makoydev/discreet/actions/runs/36698308678">Discreet's first pull request</a>.</p></div></div></details>
+    </div>
+  </div>
+</section>
+
+<section id="decisions">
+  <div class="wrap">
+    <p class="kicker">Decisions</p>
+    <h2>Twenty decision records</h2>
+    <p class="sub">Each one records the options rejected. Four are drafted and waiting for you; two record a change you made to my proposal.</p>
+    <div class="filters" role="group" aria-label="Filter decisions">
+      <button class="chip" type="button" data-filter="all" aria-pressed="true">All 20</button>
+      <button class="chip" type="button" data-filter="draft" aria-pressed="false">Waiting for you (4)</button>
+      <button class="chip" type="button" data-filter="yours" aria-pressed="false">Changed or chosen by you (4)</button>
+      <button class="chip" type="button" data-filter="vetted" aria-pressed="false">Vetted</button>
+      <button class="chip" type="button" data-filter="rules" aria-pressed="false">sg-pii-rules</button>
+    </div>
+    <div id="adrList"></div>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="wrap">
+    <p class="kicker">Evidence</p>
+    <h2>What the numbers say</h2>
+    <p class="sub">Every number here is measured and reproducible with the command named next to it, and each one states what it doesn't show. None of them come from a real AI model yet (see <a href="#next">Not done yet</a>).</p>
+
+    <div class="grid" style="gap:16px">
+      <div class="chart-card" id="canaryCard">
+        <p class="chart-title">The canary suite leaks nothing, and fails when a protection is removed</p>
+        <p class="chart-sub">Leaks reported by <code>npm run canary</code> (144 canary values, 34 runs) with the code intact, and with one protection removed on purpose</p>
+        <svg class="chart" id="canaryChart" role="img" aria-label="Canary leaks: 0 with everything on, 3 without the path deny list, 71 without the personal-data scrubber, 165 without any scrubber."></svg>
+        <details class="tableview"><summary>Show as a table</summary><div class="tbl"><table><thead><tr><th>Configuration</th><th class="n">Leaks</th></tr></thead><tbody><tr><td>Everything on (as shipped)</td><td class="n">0</td></tr><tr><td>Path deny list removed</td><td class="n">3</td></tr><tr><td>Personal-data scrubber removed</td><td class="n">71</td></tr><tr><td>All scrubbers removed</td><td class="n">165</td></tr></tbody></table></div></details>
+      </div>
+
+      <div class="grid g2" style="gap:16px">
+        <div class="chart-card" id="entropy">
+          <p class="chart-title">Choosing the entropy threshold</p>
+          <p class="chart-sub">Share of 2,000 random 32-character secrets caught, by threshold (<code>npm run measure:entropy</code>)</p>
+          <div class="legend" id="entropyLegend"></div>
+          <svg class="chart" id="entropyChart" role="img" aria-label="Catch rate falls as the threshold rises. At 4.3, 97% of base64 and 96% of alphanumeric 32-character secrets are caught; lower-case plus digits drops to 42%."></svg>
+          <details class="tableview"><summary>Show as a table</summary><div class="tbl"><table id="entropyTable"></table></div></details>
+        </div>
+        <div class="chart-card" id="fpCard">
+          <p class="chart-title">…against false alarms in real code</p>
+          <p class="chart-sub">Tokens flagged per MB of real third-party JavaScript (28.4 MB), by threshold</p>
+          <svg class="chart" id="fpChart" role="img" aria-label="False alarms per MB fall from 85.3 at 4.0 to 15.0 at 4.3 and 5.6 at 4.6."></svg>
+          <details class="tableview"><summary>Show as a table</summary><div class="tbl"><table id="fpTable"></table></div></details>
+          <p class="chart-sub" style="margin-top:8px">Vetted uses <strong>4.3</strong>: past it, the catch rate for 32-character secrets collapses, while false alarms have mostly flattened (most are base64 source maps, safe to redact).</p>
+        </div>
+      </div>
+
+      <div class="grid g2" style="gap:16px">
+        <div class="card" id="parity">
+          <h3>Parity with the real gitleaks 8.30.1</h3>
+          <p class="chart-sub"><code>npm run parity:gitleaks</code>, with decoding off</p>
+          <div class="tbl"><table>
+            <thead><tr><th>Corpus</th><th class="n">Cases</th><th class="n">gitleaks</th><th class="n">Vetted</th><th class="n">Missed</th></tr></thead>
+            <tbody>
+              <tr><td>gitleaks' own test strings</td><td class="n">3,658</td><td class="n">405</td><td class="n">470</td><td class="n"><strong>0</strong></td></tr>
+              <tr><td>Real source files (10 MB)</td><td class="n">2,028</td><td class="n">2</td><td class="n">2</td><td class="n"><strong>0</strong></td></tr>
+            </tbody>
+          </table></div>
+          <p class="chart-sub" style="margin-top:10px">All 65 extras are explained: 60 are gitleaks hiding a duplicate on a line another rule already covered (same redaction), 2 are "allow" comments Vetted ignores on purpose, and 3 are in a tar archive gitleaks skips as binary.</p>
+        </div>
+        <div class="card" id="cost">
+          <h3>A spend cap by construction</h3>
+          <p class="chart-sub">Worst case, from hard caps (<code>src/model/pricing.ts</code>): not a measurement</p>
+          <div class="tbl"><table><tbody>
+            <tr><td>Most one review can cost</td><td class="n"><strong>US$0.0104</strong></td></tr>
+            <tr><td>Paid reviews allowed per day (US$0.20 budget)</td><td class="n"><strong>19</strong></td></tr>
+            <tr><td>Most a repository can cost per month</td><td class="n"><strong>US$6.20</strong></td></tr>
+            <tr><td>Spent so far (mock model only)</td><td class="n">US$0</td></tr>
+          </tbody></table></div>
+          <p style="margin:14px 0 0;font-weight:600">Worst case for both piloted repositories vs the brief's US$20 a month</p>
+          <div class="meter" role="meter" aria-valuemin="0" aria-valuemax="20" aria-valuenow="12.4" aria-label="Worst-case monthly cost US$12.40 of the US$20 target"><span style="width:62%"></span></div>
+          <div class="meter-scale"><span>US$0</span><span><strong>US$12.40</strong> worst case</span><span>US$20 target</span></div>
+        </div>
+      </div>
+
+      <div class="grid g3" style="gap:16px">
+        <div class="card"><h3>Personal data: 184 / 184</h3><p class="chart-sub" style="margin:0">Shared conformance cases pass (NRIC 53, look-alikes 46, phone 41, email 44). <strong>Honest limit:</strong> on real code the phone detector fires about 40 times per MB, almost all on numeric constants such as 67108864 (2²⁶). The cost is context, never data.</p></div>
+        <div class="card"><h3>Injection: 6 / 6, 0 false alarms</h3><p class="chart-sub" style="margin:0">Payloads detected in the canary suite, with no alarm on 11 clean pull requests. Its first real catch: the 7 attack examples in Vetted's own test files. <strong>Honest limit:</strong> these are pattern rules, and novel wording gets past them, which is why nothing depends on them alone.</p></div>
+        <div class="card"><h3>Pilot: 1 pull request</h3><p class="chart-sub" style="margin:0">Discreet's first pull request was reviewed in shadow mode and produced an audit record. <strong>Honest limit:</strong> a sample of one, a single maintainer and the mock model. There are no quality numbers yet; that's the job of Milestone 3's dashboard.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="mistakes">
+  <div class="wrap">
+    <p class="kicker">What went wrong</p>
+    <h2>Every mistake I made, and what caught it</h2>
+    <p class="sub">All of these are in the build logs. They're part of the evidence: they show AI-assisted work being checked, not just trusted. The recurring lesson was that checks only help if nothing can quietly bypass them.</p>
+    <div class="card" id="mistakeList" style="padding:4px 20px"></div>
+  </div>
+</section>
+
+<section id="next">
+  <div class="wrap">
+    <p class="kicker">Not done yet</p>
+    <h2>Deliberately left for later</h2>
+    <div class="grid g2">
+      <div class="card"><h3>Needs you</h3><ul class="clean">
+        <li><strong>Real-model numbers</strong> (GPT-6 Luna vs gpt-5-nano, real cost per review, review quality): they need the <code>OPENAI_API_KEY</code> secret, which only you set.</li>
+        <li><strong>Final v0.1.0 releases</strong>: after your merge. Releases come from <code>main</code> only.</li>
+      </ul></div>
+      <div class="card"><h3>Milestone 3, as planned</h3><ul class="clean">
+        <li>Metrics branch and dashboard: acceptance, overrides and cost per pull request. This closes the override-rate gap in <a href="https://github.com/makoydev/vetted/blob/next/CONTROLS.md">CONTROLS.md</a>.</li>
+        <li>Default-on mode, suppressions with an expiry date, the Marketplace listing.</li>
+        <li>Incident playbook, policy template, pilot plan.</li>
+      </ul></div>
+      <div class="card"><h3>Known gaps, stated in the docs</h3><ul class="clean">
+        <li>Base64-encoded secrets aren't decoded (gitleaks does this); the entropy check covers long ones.</li>
+        <li>Names and addresses aren't detected; that needs NER, planned for Discreet.</li>
+        <li>A pull request can edit its own workflow file. Vetted is advisory, so it's deliberately not a required check; the batch review is the backstop.</li>
+      </ul></div>
+      <div class="card"><h3>Small calls I made on my own</h3><ul class="clean">
+        <li>Closed four major-version Dependabot upgrades: TypeScript 7 breaks the build, and Node 26 types don't match the runtime.</li>
+        <li>Made CodeQL and the canary suite required checks, after CodeQL caught two real issues.</li>
+        <li>Size cap in bytes, not characters, so the cost bound is real. Entropy threshold 4.3. Look-alike NRICs scrubbed too.</li>
+        <li>Vetted reviews its own pull requests from a pinned, merged version, never the code under review.</li>
+      </ul></div>
+    </div>
+  </div>
+</section>
+
+<section id="risks">
+  <div class="wrap">
+    <p class="kicker">Risks</p>
+    <h2>What to watch</h2>
+    <div class="tbl card" style="padding:6px 12px"><table>
+      <thead><tr><th>Risk</th><th>Now</th><th>What's being done</th></tr></thead>
+      <tbody>
+        <tr><td><strong>R11</strong> A flaw merged into <code>next</code> by AI that CI didn't catch</td><td>Medium</td><td>Your batch review; CodeQL and the canary suite are required; every AI merge is labelled</td></tr>
+        <tr><td><strong>R12</strong> No real-model results</td><td>High</td><td>Mock everywhere, and it says so; the comparison is pending your key</td></tr>
+        <tr><td><strong>R9</strong> Pilot too small to mean much</td><td>High</td><td>Sample sizes are stated; opt-in from 14 October; replay evaluation in M3</td></tr>
+        <tr><td><strong>R1</strong> Schedule</td><td>Low (was High)</td><td>M1 was built on 30 September against a 25 October due date; the remaining time goes to review and M2</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<section id="frameworks">
+  <div class="wrap">
+    <p class="kicker">Frameworks</p>
+    <h2>Mapped to Singapore's rulebook</h2>
+    <p class="sub">18 Vetted features and 10 sg-pii-rules features are mapped to specific clauses, with page references from primary sources read on 30 September. Where a framework only applies by analogy, the matrix says why.</p>
+    <div class="frameworks">
+      <div class="fw"><b>IMDA Model AI Governance Framework for GenAI</b><span>accountability, data, security, testing, provenance</span></div>
+      <div class="fw"><b>IMDA Framework for Agentic AI v1.5</b><span>bounding, human accountability, gradual rollout (by analogy)</span></div>
+      <div class="fw"><b>PDPA 2012</b><span>s.24 protection, s.26 transfer outside Singapore</span></div>
+      <div class="fw"><b>PDPC NRIC guidelines</b><span>§3.1, §5.2 partial NRICs</span></div>
+      <div class="fw"><b>PDPC AI guidelines (2024)</b><span>¶7.1–7.2 minimise, pseudonymise (by analogy)</span></div>
+      <div class="fw"><b>OWASP LLM Top 10 2025</b><span>LLM01, 02, 03, 05, 06, 10</span></div>
+      <div class="fw"><b>IMDA LLM Starter Kit</b><span>§3.5 data leakage, §3.6 adversarial prompts</span></div>
+      <div class="fw"><b>CSA Securing AI Systems</b><span>supply chain, monitoring, human oversight</span></div>
+      <div class="fw"><b>NIST SSDF · AI RMF · AI 600-1</b><span>supporting controls</span></div>
+      <div class="fw"><b>ISO/IEC 42001</b><span>control IDs only (paid standard)</span></div>
+    </div>
+    <p style="margin-top:14px"><a href="https://github.com/makoydev/vetted/blob/next/CONTROLS.md">Vetted's CONTROLS.md</a> · <a href="https://github.com/makoydev/sg-pii-rules/blob/next/CONTROLS.md">sg-pii-rules' CONTROLS.md</a> · <a href="https://github.com/makoydev/vetted/blob/next/THREAT_MODEL.md">Threat model</a> · <a href="https://github.com/makoydev/vetted/blob/next/EVALS.md">Evaluation</a></p>
+  </div>
+</section>
+
+<section id="interview">
+  <div class="wrap">
+    <p class="kicker">Interview crib</p>
+    <h2>If you're asked about Milestone 1</h2>
+    <ol class="crib">
+      <li><strong>"What is it?"</strong> A GitHub Action that lets a team use AI for code review without sending secrets or Singapore personal data to the provider, without letting text in the code steer the AI, and without the AI ever approving anything.</li>
+      <li><strong>"How do you know it doesn't leak?"</strong> A canary suite pushes pull requests full of fake passwords and identity numbers through the real code, even against a model that repeats everything back, and searches every output for them. Zero leaks. I also proved it fails when I remove a protection.</li>
+      <li><strong>"Did you write this yourself?"</strong> Claude Code drafted it under a written brief. Every change went through a pull request with CI. I merged the early ones myself, then chose an integration branch so the AI could merge into staging while I review the batch before main. Every AI mistake is logged with how it was caught.</li>
+      <li><strong>"What would you do differently?"</strong> I'd set the API key on day one: the biggest gap in the evidence is that no real model has been measured yet.</li>
+      <li><strong>"Why Singapore-specific?"</strong> The NRIC is treated as especially sensitive by PDPC, the checksum was never officially published, and sending personal data to an overseas AI provider is a transfer out of Singapore. The controls matrix maps each feature to the specific clause.</li>
+    </ol>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Decision report for Milestone 1 of the AI Governance Toolkit, written by Claude Code on 30 September 2026 for Michael Mendoza's review. The numbers come from the repositories' <code>EVALS.md</code> files, CI runs and GitHub history on that date.</p>
+    <p><a href="https://github.com/users/makoydev/projects/1">Programme board</a> · <a href="https://makoydev.github.io/vetted/">Vetted in plain words</a> · <a href="https://github.com/makoydev/vetted/tree/next">vetted (next)</a> · <a href="https://github.com/makoydev/sg-pii-rules/tree/next">sg-pii-rules (next)</a> · <a href="https://github.com/makoydev/discreet">discreet</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+
+  // ----- Theme toggle (per-viewer convenience only) -----
+  var root = document.documentElement;
+  try {
+    var saved = localStorage.getItem('m1-theme');
+    if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved);
+  } catch (e) { /* storage unavailable: follow the OS setting */ }
+  function currentTheme() {
+    var set = root.getAttribute('data-theme');
+    if (set) return set;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  var toggle = document.getElementById('themeToggle');
+  function labelToggle() { toggle.textContent = currentTheme() === 'dark' ? 'Light theme' : 'Dark theme'; }
+  labelToggle();
+  toggle.addEventListener('click', function () {
+    var next = currentTheme() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try { localStorage.setItem('m1-theme', next); } catch (e) { /* ignore */ }
+    labelToggle();
+  });
+
+  // ----- Helpers -----
+  var NS = 'http://www.w3.org/2000/svg';
+  function el(name, attrs, parent) {
+    var node = document.createElementNS(NS, name);
+    for (var k in attrs) {
+      // CSS variables are only reliable in SVG through style, not attributes.
+      if ((k === 'fill' || k === 'stroke') && String(attrs[k]).indexOf('var(') === 0) node.style[k] = attrs[k];
+      else node.setAttribute(k, attrs[k]);
+    }
+    if (parent) parent.appendChild(node);
+    return node;
+  }
+  function text(parent, x, y, value, attrs) {
+    var t = el('text', Object.assign({ x: x, y: y }, attrs || {}), parent);
+    t.textContent = value;
+    return t;
+  }
+  function makeTip(card) {
+    var tip = document.createElement('div');
+    tip.className = 'tip';
+    tip.setAttribute('role', 'status');
+    card.appendChild(tip);
+    return tip;
+  }
+  function showTip(tip, card, x, y, build) {
+    while (tip.firstChild) tip.removeChild(tip.firstChild);
+    build(tip);
+    tip.classList.add('show');
+    var cw = card.clientWidth, tw = tip.offsetWidth;
+    var left = Math.min(Math.max(x + 14, 8), cw - tw - 8);
+    tip.style.left = left + 'px';
+    tip.style.top = Math.max(y - 10, 8) + 'px';
+  }
+  function hideTip(tip) { tip.classList.remove('show'); }
+  function tipRow(tip, key, color, value) {
+    var row = document.createElement('div'); row.className = 'row';
+    var k = document.createElement('span'); k.className = 'k';
+    if (color) { var i = document.createElement('i'); i.style.background = color; k.appendChild(i); }
+    k.appendChild(document.createTextNode(key));
+    var b = document.createElement('b'); b.textContent = value;
+    row.appendChild(k); row.appendChild(b); tip.appendChild(row);
+  }
+  function cssVar(name) { return getComputedStyle(root).getPropertyValue(name).trim(); }
+  function relPos(card, evt) {
+    var r = card.getBoundingClientRect();
+    return { x: evt.clientX - r.left, y: evt.clientY - r.top };
+  }
+
+  // Charts are drawn at the container's real pixel width (1 SVG unit = 1px),
+  // so text stays legible on phones, and redrawn when the width changes.
+  function responsive(card, draw) {
+    var last = 0;
+    function run() {
+      // Measure the space the chart may use, not the chart itself.
+      var w = Math.floor(svgParentWidth(card) - 36);
+      if (w > 0 && w !== last) { last = w; draw(w); }
+    }
+    run();
+    if (window.ResizeObserver) new ResizeObserver(run).observe(card);
+    else window.addEventListener('resize', run);
+  }
+  function clear(svg) { while (svg.firstChild) svg.removeChild(svg.firstChild); }
+  function svgParentWidth(card) {
+    // The card's width as laid out by its grid cell, ignoring the SVG inside.
+    return card.getBoundingClientRect().width;
+  }
+
+  // ----- Chart 1: canary leaks (single series, horizontal bars) -----
+  (function canary() {
+    var data = [
+      { label: 'Everything on (as shipped)', value: 0 },
+      { label: 'Path deny list removed', value: 3 },
+      { label: 'Personal-data scrubber removed', value: 71 },
+      { label: 'All scrubbers removed', value: 165 }
+    ];
+    var svg = document.getElementById('canaryChart');
+    var card = document.getElementById('canaryCard');
+    var tip = makeTip(card);
+    responsive(card, function (W) {
+      clear(svg);
+      // Wide: labels beside the bars. Narrow: labels above them.
+      var wide = W >= 560;
+      var labelW = wide ? 230 : 0, right = 64, barH = 22;
+      var rowH = wide ? 44 : 58, top = 8;
+      var H = top + data.length * rowH + 30;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      var max = 180, plotW = W - labelW - right;
+      var x = function (v) { return labelW + (v / max) * plotW; };
+      [0, 50, 100, 150].forEach(function (t) {
+        el('line', { x1: x(t), x2: x(t), y1: top, y2: top + data.length * rowH, stroke: 'var(--grid)', 'stroke-width': 1 }, svg);
+        text(svg, x(t), top + data.length * rowH + 20, String(t), { 'text-anchor': 'middle' });
+      });
+      el('line', { x1: x(0), x2: x(0), y1: top, y2: top + data.length * rowH, stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      data.forEach(function (d, i) {
+        var rowTop = top + i * rowH;
+        var cy = wide ? rowTop + rowH / 2 : rowTop + 36;
+        if (wide) text(svg, labelW - 12, cy + 4, d.label, { 'text-anchor': 'end', 'class': i === 0 ? 'strong' : '' });
+        else text(svg, 0, rowTop + 16, d.label, { 'class': i === 0 ? 'strong' : '' });
+        var w = x(d.value) - x(0);
+        if (w > 0) {
+          var r = Math.min(4, w);
+          // Square at the baseline, 4px rounded at the data end.
+          var y0 = cy - barH / 2, x0 = x(0);
+          var path = 'M' + x0 + ',' + y0 + ' H' + (x0 + w - r) + ' Q' + (x0 + w) + ',' + y0 + ' ' + (x0 + w) + ',' + (y0 + r) +
+            ' V' + (y0 + barH - r) + ' Q' + (x0 + w) + ',' + (y0 + barH) + ' ' + (x0 + w - r) + ',' + (y0 + barH) + ' H' + x0 + ' Z';
+          el('path', { d: path, fill: 'var(--series-1)' }, svg);
+        }
+        text(svg, x(d.value) + 8, cy + 4, d.value === 0 ? '0 leaks' : String(d.value), { 'class': 'strong' });
+        var hit = el('rect', { x: 0, y: rowTop, width: W, height: rowH, 'class': 'hit', tabindex: 0, 'aria-label': d.label + ': ' + d.value + ' leaks' }, svg);
+        var show = function (evt) {
+          var p = evt && evt.clientX !== undefined ? relPos(card, evt) : { x: card.clientWidth * 0.4, y: 70 + rowTop };
+          showTip(tip, card, p.x, p.y, function (t) {
+            var h = document.createElement('div'); h.className = 'head'; h.textContent = d.label; t.appendChild(h);
+            tipRow(t, 'Leaks', cssVar('--series-1'), String(d.value));
+          });
+        };
+        hit.addEventListener('pointermove', show);
+        hit.addEventListener('focus', function () { show(null); });
+        hit.addEventListener('pointerleave', function () { hideTip(tip); });
+        hit.addEventListener('blur', function () { hideTip(tip); });
+      });
+    });
+  })();
+
+  // ----- Chart 2 and 3: entropy calibration (two charts, one axis each) -----
+  var thresholds = [4.0, 4.2, 4.3, 4.4, 4.5, 4.6];
+  var series = [
+    { name: '32-char base64', color: '--series-1', values: [100, 99, 97, 88, 66, 44] },
+    { name: '32-char alphanumeric', color: '--series-2', values: [100, 99, 96, 86, 62, 41] },
+    { name: '32-char lower-case + digits', color: '--series-3', values: [96, 72, 42, 18, 4, 1] }
+  ];
+  var fp = [85.3, 25.7, 15.0, 8.8, 6.4, 5.6];
+
+  function lineChart(opts) {
+    var svg = document.getElementById(opts.svgId);
+    var card = document.getElementById(opts.cardId);
+    var tip = makeTip(card);
+    var focusIndex = 2;
+    responsive(card, function (W) {
+      clear(svg);
+      var H = W < 420 ? 240 : 280, L = 44, R = 18, T = 14, B = 34;
+      svg.setAttribute('viewBox', '0 0 ' + W + ' ' + H);
+      svg.setAttribute('width', W); svg.setAttribute('height', H);
+      var x = function (v) { return L + (v - 4.0) / 0.6 * (W - L - R); };
+      var y = function (v) { return T + (1 - v / opts.max) * (H - T - B); };
+      opts.ticks.forEach(function (t) {
+        el('line', { x1: L, x2: W - R, y1: y(t), y2: y(t), stroke: 'var(--grid)', 'stroke-width': 1 }, svg);
+        text(svg, L - 8, y(t) + 4, opts.tickFmt(t), { 'text-anchor': 'end' });
+      });
+      el('line', { x1: L, x2: W - R, y1: y(0), y2: y(0), stroke: 'var(--axis)', 'stroke-width': 1 }, svg);
+      thresholds.forEach(function (t) { text(svg, x(t), H - B + 18, t.toFixed(1), { 'text-anchor': 'middle' }); });
+      // The chosen threshold, labelled where no line passes.
+      el('line', { x1: x(4.3), x2: x(4.3), y1: T, y2: y(0), stroke: 'var(--ink)', 'stroke-width': 1, opacity: 0.45 }, svg);
+      text(svg, x(4.3) + 6, y(opts.ruleLabelAt) + 4, 'Vetted: 4.3', { 'class': 'strong' });
+      opts.series.forEach(function (s) {
+        var d = s.values.map(function (v, i) { return (i ? 'L' : 'M') + x(thresholds[i]) + ',' + y(v); }).join(' ');
+        el('path', { d: d, fill: 'none', stroke: 'var(' + s.color + ')', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }, svg);
+        s.values.forEach(function (v, i) {
+          el('circle', { cx: x(thresholds[i]), cy: y(v), r: 4, fill: 'var(' + s.color + ')', stroke: 'var(--card)', 'stroke-width': 2 }, svg);
+        });
+      });
+      if (opts.endLabel) opts.endLabel(svg, x, y, W);
+      // Crosshair snapping to the nearest threshold.
+      var cross = el('line', { x1: 0, x2: 0, y1: T, y2: y(0), stroke: 'var(--muted)', 'stroke-width': 1, opacity: 0 }, svg);
+      var hit = el('rect', { x: L, y: T, width: W - L - R, height: H - T - B, 'class': 'hit', tabindex: 0, 'aria-label': opts.aria }, svg);
+      function showAt(i, pos) {
+        cross.setAttribute('x1', x(thresholds[i])); cross.setAttribute('x2', x(thresholds[i])); cross.setAttribute('opacity', 0.6);
+        showTip(tip, card, pos.x, pos.y, function (t) {
+          var h = document.createElement('div'); h.className = 'head'; h.textContent = 'Threshold ' + thresholds[i].toFixed(1); t.appendChild(h);
+          opts.series.forEach(function (s) { tipRow(t, s.name, cssVar(s.color), opts.fmt(s.values[i])); });
+        });
+      }
+      hit.addEventListener('pointermove', function (evt) {
+        var box = svg.getBoundingClientRect();
+        var vx = (evt.clientX - box.left) / box.width * W;
+        var best = 0;
+        thresholds.forEach(function (t, i) { if (Math.abs(x(t) - vx) < Math.abs(x(thresholds[best]) - vx)) best = i; });
+        showAt(best, relPos(card, evt));
+      });
+      hit.addEventListener('keydown', function (evt) {
+        if (evt.key === 'ArrowRight') focusIndex = Math.min(thresholds.length - 1, focusIndex + 1);
+        else if (evt.key === 'ArrowLeft') focusIndex = Math.max(0, focusIndex - 1);
+        else return;
+        evt.preventDefault();
+        showAt(focusIndex, { x: card.clientWidth * 0.3, y: 90 });
+      });
+      hit.addEventListener('focus', function () { showAt(focusIndex, { x: card.clientWidth * 0.3, y: 90 }); });
+      function hide() { hideTip(tip); cross.setAttribute('opacity', 0); }
+      hit.addEventListener('pointerleave', hide);
+      hit.addEventListener('blur', hide);
+    });
+  }
+
+  // Legend (always present for 2+ series).
+  var legend = document.getElementById('entropyLegend');
+  series.forEach(function (s) {
+    var span = document.createElement('span');
+    var i = document.createElement('i'); i.style.background = 'var(' + s.color + ')';
+    span.appendChild(i); span.appendChild(document.createTextNode(s.name));
+    legend.appendChild(span);
+  });
+
+  lineChart({
+    svgId: 'entropyChart', cardId: 'entropy', max: 100, ticks: [0, 25, 50, 75, 100], ruleLabelAt: 6,
+    fmt: function (v) { return Math.round(v) + '%'; },
+    tickFmt: function (v) { return v + '%'; },
+    series: series,
+    aria: 'Catch rate by threshold. Use the left and right arrow keys to move between thresholds.',
+    endLabel: function (svg, x, y, W) {
+      // Label selectively: the series that separates at the chosen threshold.
+      text(svg, x(4.3) + 8, y(42) + 4, W < 420 ? '42%' : 'lower-case + digits: 42%', { 'class': 'strong' });
+    }
+  });
+  lineChart({
+    svgId: 'fpChart', cardId: 'fpCard', max: 90, ticks: [0, 30, 60, 90], ruleLabelAt: 84,
+    fmt: function (v) { return (Math.round(v * 10) / 10).toFixed(1); },
+    tickFmt: function (v) { return String(v); },
+    series: [{ name: 'False alarms per MB', color: '--muted', values: fp }],
+    aria: 'False alarms per MB by threshold. Use the left and right arrow keys to move between thresholds.',
+    endLabel: function (svg, x, y) { text(svg, x(4.3) + 8, y(15.0) - 8, '15.0 per MB', { 'class': 'strong' }); }
+  });
+
+  // Table views.
+  function fillTable(id, header, rows) {
+    var table = document.getElementById(id);
+    var thead = document.createElement('thead'); var tr = document.createElement('tr');
+    header.forEach(function (h, i) { var th = document.createElement('th'); th.textContent = h; if (i) th.className = 'n'; tr.appendChild(th); });
+    thead.appendChild(tr); table.appendChild(thead);
+    var tbody = document.createElement('tbody');
+    rows.forEach(function (r) {
+      var row = document.createElement('tr');
+      r.forEach(function (c, i) { var td = document.createElement('td'); td.textContent = c; if (i) td.className = 'n'; row.appendChild(td); });
+      tbody.appendChild(row);
+    });
+    table.appendChild(tbody);
+  }
+  fillTable('entropyTable', ['Threshold'].concat(series.map(function (s) { return s.name; })),
+    thresholds.map(function (t, i) { return [t.toFixed(1)].concat(series.map(function (s) { return s.values[i] + '%'; })); }));
+  fillTable('fpTable', ['Threshold', 'Per MB'], thresholds.map(function (t, i) { return [t.toFixed(1), fp[i].toFixed(1)]; }));
+
+  // ----- Decisions -----
+  var V = 'https://github.com/makoydev/vetted/blob/next/docs/adr/';
+  var S = 'https://github.com/makoydev/sg-pii-rules/blob/next/docs/adr/';
+  var adrs = [
+    { repo: 'vetted', id: '0001', file: '0001-separate-public-repos.md', status: 'acc', title: 'One public repository per component', why: 'The Marketplace needs a single-action repository, and free branch protection needs public repositories; the process itself is evidence.', rejected: 'A monorepo; private repositories until release.' },
+    { repo: 'vetted', id: '0002', file: '0002-typescript-javascript-action.md', status: 'acc', title: 'A TypeScript action on node24, from GitHub’s template', why: 'Fast to start, recognisable to reviewers, and Node 20 was removed from runners on 23 September.', rejected: 'Docker and composite actions.' },
+    { repo: 'vetted', id: '0003', file: '0003-openai-behind-model-interface.md', status: 'mine', title: 'OpenAI behind an interface, GPT-6 Luna by default', why: 'Swappable provider; the cheaper model stays in the evaluation so "cheapest that works" is measured.', rejected: 'gpt-5-nano as default (you changed it); Claude Haiku; GitHub Models.' },
+    { repo: 'vetted', id: '0004', file: '0004-daily-budget-worst-case-bound.md', status: 'acc', title: 'The daily budget as a worst-case bound', why: 'A bound from hard caps can stop a runaway before it happens; measuring spend afterwards cannot.', rejected: 'An actual-spend ledger, which needs write access.' },
+    { repo: 'vetted', id: '0005', file: '0005-gitleaks-rules-via-re2js.md', status: 'acc', title: 'gitleaks’ rules, run by re2js', why: 'A recognised rule set without downloading and running a binary on every run.', rejected: 'Running the gitleaks binary; hand-written regexes.' },
+    { repo: 'vetted', id: '0006', file: '0006-report-injection-do-not-strip.md', status: 'acc', title: 'Report prompt injection; never strip it', why: 'Stripping hides the attempt from the reviewer and can change what the code means.', rejected: 'Removing suspicious text before sending.' },
+    { repo: 'vetted', id: '0007', file: '0007-base-ref-config-and-safe-trigger.md', status: 'acc', title: 'Config from the base commit; pull_request only', why: 'A pull request cannot weaken its own review, and fork code never gets secrets.', rejected: 'Config from the head; pull_request_target.' },
+    { repo: 'vetted', id: '0008', file: '0008-pr-identity-and-branch-protection.md', status: 'acc', title: 'Pull requests from your account, labelled ai-drafted', why: 'GitHub blocks self-approval, so review is enforced by process; labels keep AI involvement visible.', rejected: 'A machine account (stronger, more setup).' },
+    { repo: 'vetted', id: '0009', file: '0009-integration-branch.md', status: 'mine', title: 'Integration branch: AI merges into next, you merge into main', why: 'Removes you as the per-change bottleneck without giving up control of what ships.', rejected: 'Leaving every PR open (15+ merge rounds); AI merging to main.' },
+    { repo: 'vetted', id: '0010', file: '0010-secret-scrubbing-deviations.md', status: 'draft', title: 'Five places Vetted is stricter than gitleaks', why: 'Copying gitleaks exactly would let some secrets through: inline "allow" comments, a leaking (?i) flag, a regex that allowlists anything containing "false", partial redaction, path allowlists.', rejected: 'An exact replica, quirks included.' },
+    { repo: 'vetted', id: '0011', file: '0011-model-client-and-fail-closed-choice.md', status: 'draft', title: 'A plain-fetch client and a model choice that fails closed', why: 'Every byte sent is visible in 150 lines; any uncertainty (price, budget, permissions) means the free mock, never an unbounded call.', rejected: 'The OpenAI SDK; failing open with a warning.' },
+    { repo: 'vetted', id: '0012', file: '0012-what-vetted-posts.md', status: 'draft', title: 'What Vetted posts, when, and how model text is made safe', why: 'Shadow never posts; injection findings survive a broken model; links and images are removed from AI text; COMMENT only.', rejected: 'Posting everything; posting only when the model output is valid.' },
+    { repo: 'rules', id: '0001', file: '0001-rules-as-data-in-re2.md', status: 'acc', title: 'Rules as data, in RE2, with named validators', why: 'Two products in two languages must agree; RE2 behaves the same in Go and JavaScript and can’t backtrack forever.', rejected: 'A library per language; one WebAssembly library.' },
+    { repo: 'rules', id: '0002', file: '0002-fixtures-compare-values-not-offsets.md', status: 'acc', title: 'Test cases compare values, not positions', why: 'JavaScript counts UTF-16 units and Go counts bytes; values are language-neutral.', rejected: 'Offsets with a declared unit.' },
+    { repo: 'rules', id: '0003', file: '0003-overlap-resolution.md', status: 'acc', title: 'Overlaps: the longest match wins', why: 'A phone-shaped number inside an email is reported once, as an email.', rejected: 'Reporting overlaps; ranking entity types.' },
+    { repo: 'rules', id: '0004', file: '0004-vendor-tagged-release-with-checksums.md', status: 'acc', title: 'Consumers vendor a tagged release and verify checksums', why: 'An unnoticed change to what counts as personal data is a privacy risk.', rejected: 'npm and Go packages; git submodules.' },
+    { repo: 'rules', id: '0005', file: '0005-reference-runner-node-test.md', status: 'acc', title: 'A TypeScript reference on node:test, no build step', why: 'Very little tooling; Node 24 runs TypeScript directly.', rejected: 'A Go reference; Jest.' },
+    { repo: 'rules', id: '0006', file: '0006-nric-checksum-precision-over-recall.md', status: 'mine', title: 'Two NRIC detectors: valid, and look-alikes', why: 'A mistyped NRIC is still personal data; you chose to catch it now.', rejected: 'Checksum only (the brief); shape only.' },
+    { repo: 'rules', id: '0007', file: '0007-phone-and-email-by-shape.md', status: 'draft', title: 'Phone and email matched by shape, false positives published', why: 'For a privacy control a miss leaks and a false alarm costs a placeholder; context words would miss CSV, JSON and code.', rejected: 'Context words; a full RFC 5322 grammar.' },
+    { repo: 'rules', id: '0008', file: '0008-integration-branch.md', status: 'mine', title: 'Integration branch, with release candidates on next', why: 'Vetted needed a tagged version before your review; the final release reuses byte-identical files.', rejected: 'Tagging the final release from next.' }
+  ];
+  var list = document.getElementById('adrList');
+  var labels = { acc: 'Accepted by you', draft: 'Waiting for you', mine: 'Your decision' };
+  adrs.forEach(function (a) {
+    var d = document.createElement('details'); d.className = 'adr';
+    d.dataset.repo = a.repo; d.dataset.status = a.status;
+    var s = document.createElement('summary');
+    var id = document.createElement('span'); id.className = 'id'; id.textContent = (a.repo === 'vetted' ? 'Vetted ' : 'Rules ') + a.id;
+    var title = document.createElement('span'); title.className = 'title'; title.textContent = a.title;
+    var badge = document.createElement('span'); badge.className = 'badge ' + a.status; badge.textContent = labels[a.status];
+    s.appendChild(id); s.appendChild(title); s.appendChild(badge); d.appendChild(s);
+    var body = document.createElement('div'); body.className = 'body';
+    [['Why it mattered', a.why], ['Rejected', a.rejected]].forEach(function (pair) {
+      var dl = document.createElement('dl');
+      var dt = document.createElement('dt'); dt.textContent = pair[0];
+      var dd = document.createElement('dd'); dd.textContent = pair[1];
+      dl.appendChild(dt); dl.appendChild(dd); body.appendChild(dl);
+    });
+    var link = document.createElement('a');
+    link.href = (a.repo === 'vetted' ? V : S) + a.file; link.textContent = 'Read the full record';
+    body.appendChild(link);
+    d.appendChild(body); list.appendChild(d);
+  });
+  var chips = document.querySelectorAll('.chip');
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.setAttribute('aria-pressed', c === chip ? 'true' : 'false'); });
+      var f = chip.getAttribute('data-filter');
+      list.querySelectorAll('.adr').forEach(function (d) {
+        var show = f === 'all' ||
+          (f === 'draft' && d.dataset.status === 'draft') ||
+          (f === 'yours' && d.dataset.status === 'mine') ||
+          (f === 'vetted' && d.dataset.repo === 'vetted') ||
+          (f === 'rules' && d.dataset.repo === 'rules');
+        d.hidden = !show;
+      });
+    });
+  });
+
+  // ----- Mistakes -----
+  var mistakes = [
+    ['vetted', 'Kept the template’s Prettier setting that hard-wraps Markdown; CLAUDE.md grew past its 80-line limit.', 'A line count before committing.', 'Set Prettier to preserve wrapping.'],
+    ['vetted', 'A release lookup returned a CodeQL bundle tag instead of an Action version.', 'The tag format looked wrong before pinning.', 'Pinned the v4 tag’s commit.'],
+    ['vetted', 'Tried to add required checks through an endpoint that only edits existing ones.', 'The API returned 404.', 'Re-applied the whole branch protection with the checks.'],
+    ['sg-pii-rules', 'The fixture generator searched with an unbounded loop, which hung when the validator was broken on purpose.', 'A deliberate-break check hung instead of failing.', 'Bounded, independent search.'],
+    ['sg-pii-rules', 'While stopping that hung check, a git checkout wiped my uncommitted validator.', 'Checking every file’s state afterwards.', 'Rewrote it; deliberate breaks now restore from backups, never git checkout.'],
+    ['sg-pii-rules', 'The first NRIC test vectors missed the one remainder where the M and F/G letter tables differ.', 'A deliberate break was caught by only one test.', 'Added vectors; now caught twice.'],
+    ['sg-pii-rules', 'My first phone pattern missed +6591234567 (no space after the country code).', 'Probing the pattern before writing fixtures.', 'Word boundary applied only without a country code.'],
+    ['sg-pii-rules', 'I wrote a Malaysian number as a hard negative, although no regex can tell it apart.', 'The conformance test failed.', 'Removed the case and published the limitation, instead of encoding wrong behaviour as right.'],
+    ['sg-pii-rules', 'Email test cases ended up with 19 hard negatives, one short of the minimum, after I classed one as mixed.', 'The minimum-count test failed.', 'Added a genuine hard negative.'],
+    ['sg-pii-rules', 'Committed past a failed format check, twice: piping into tail hid the failure.', 'Reading the output before opening the pull request.', 'Amended before review; added pipefail.'],
+    ['vetted', 'The same class of mistake a third time: a failing test was committed because grep hid the result.', 'Reading the test summary; CI would have blocked the merge.', 'All checks now run through a gate script that stops on any failure.'],
+    ['vetted', 'The entropy calibration sampled randomly with modulo bias, and my merge helper would have merged anyway because CodeQL wasn’t required.', 'CodeQL flagged it (high); I stopped the helper.', 'Unbiased sampling; CodeQL made required; the helper now refuses on any failed check.'],
+    ['vetted', 'The comment sanitiser stripped HTML tags in one pass, which nested tags can defeat.', 'CodeQL (high); the helper refused to merge.', 'Escape instead of strip, with a regression test.'],
+    ['vetted', 'My first "only the deny list can stop this" canary was actually caught by the entropy check, so it didn’t test the deny list at all.', 'A deliberate break (deny list emptied) still reported 0 leaks.', 'A passphrase with spaces that nothing else catches; now the break reports 3 leaks.'],
+    ['tooling', 'My merge helper first gave up while a re-triggered check was still pending, and once I passed it the wrong pull request number.', 'Its own guards: it refused to merge both times.', 'It now waits until nothing is pending and checks the final state.'],
+    ['vetted', 'Two overclaims in the docs: CODEOWNERS "covering" workflows (it enforces nothing with zero approvals) and a monthly cost bound of US$6.24 (it is US$6.20).', 'Re-reading my own drafts before committing.', 'Corrected before they were committed.']
+  ];
+  var ml = document.getElementById('mistakeList');
+  mistakes.forEach(function (m) {
+    var row = document.createElement('div'); row.className = 'mistake';
+    [['What went wrong', m[1], m[0]], ['What caught it', m[2]], ['Fix', m[3]]].forEach(function (cell) {
+      var c = document.createElement('div');
+      var lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = cell[0];
+      c.appendChild(lab);
+      if (cell[2]) { var repo = document.createElement('span'); repo.className = 'repo'; repo.textContent = cell[2] + ' · '; c.appendChild(repo); }
+      c.appendChild(document.createTextNode(cell[1]));
+      row.appendChild(c);
+    });
+    ml.appendChild(row);
+  });
+})();
+</script>
+</body>
+</html>
