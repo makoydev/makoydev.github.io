@@ -5,9 +5,10 @@ Static pages for the AI Governance Toolkit, served by GitHub Pages at <https://m
 | Path | What it is |
 |---|---|
 | [`/vetted/`](https://makoydev.github.io/vetted/) | Vetted, in plain words: an animated explainer for non-technical readers |
+| [`/vetted/try/`](https://makoydev.github.io/vetted/try/) | Try Vetted live: drag fake secrets, NRICs and tricks into a code change and watch Vetted's real v0.1.0 rules protect it, in the browser. Built by `tools/try/build.sh`; the page cannot connect anywhere (`connect-src 'none'`) |
 | [`/vetted/m1-review/`](https://makoydev.github.io/vetted/m1-review/) | Milestone 1 decision report: what was built, the decisions and evidence, every AI mistake, and what was left out |
 | `/` | Redirects to `/vetted/` until the toolkit landing page ships (Milestone 3) |
 
-Each page is a single self-contained HTML file with no build step. Fonts load from Google Fonts and fall back to system fonts offline.
+Each page is a single self-contained HTML file. Only `/vetted/try/` has a build step, which bundles Vetted's real detection code from a release tag. Fonts load from Google Fonts and fall back to system fonts offline.
 
 Every change goes through a pull request. Project board: <https://github.com/users/makoydev/projects/1>
