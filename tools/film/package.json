@@ -1,0 +1,12 @@
+{
+  "name": "vetted-film",
+  "private": true,
+  "type": "module",
+  "description": "Builds the 46-second Vetted explainer film (picture + synthesised sound)",
+  "scripts": {
+    "build": "node audio.mjs build/soundtrack.wav && node render.mjs build/soundtrack.wav ../../vetted/film/vetted-film.mp4 \"$CHROME\""
+  },
+  "devDependencies": {
+    "puppeteer-core": "24.23.0"
+  }
+}
