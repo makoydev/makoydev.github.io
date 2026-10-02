@@ -2,7 +2,7 @@
   "name": "vetted-film",
   "private": true,
   "type": "module",
-  "description": "Builds the 50-second Vetted explainer film (picture + synthesised sound)",
+  "description": "Builds the 30-second Vetted explainer film (picture + synthesised sound)",
   "scripts": {
     "build": "node audio.mjs build/soundtrack.wav && node render.mjs build/soundtrack.wav ../../vetted/film/vetted-film.mp4 \"$CHROME\""
   },

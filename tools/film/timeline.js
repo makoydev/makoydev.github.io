@@ -1,17 +1,29 @@
-// Cue times in seconds, shared by the picture (film.html) and the sound (audio.mjs),
-// so every sound effect lands on the frame it belongs to.
+// Cue times in seconds, shared by the picture (film.html) and the sound (audio.mjs).
+// The music runs at 120 BPM (one beat every 0.5 s) and every visual hit sits on that grid,
+// so the animation and the soundtrack land together.
 globalThis.TL = {
   fps: 30,
-  duration: 50,
-  // Background colour per scene: [start, colour, wipe centre x, wipe centre y]
-  bg: [[0, '#0b7a66', 960, 540], [4.5, '#f6efe4', 700, 640], [11, '#14213d', 960, 540], [27, '#ffd8a8', 960, 540], [32, '#8ecae6', 960, 540], [37, '#f6efe4', 960, 540], [44.5, '#0b7a66', 960, 540]],
-  s1: { drop: 0.3, land: 0.9, line1: 1.4, line2: 2.7, wave: 3.4 },
-  s2: { open: 4.9, items: [5.5, 6.6, 7.7, 8.8, 9.9], close: 10.6 }, // each item flies for 0.7 s
-  s3: { slide: [11.6, 13.1], beeps: [13.3, 13.65, 14.0], zoom: [14.4, 15.1] },
-  s4: { wraps: [15.6, 17.1, 18.3, 19.5], sneak: [21.2, 22.4], siren: [22.4, 23.6], nice: 22.6, unmask: 22.9, tray: [24.1, 24.8] },
-  s5: { coins: [27.8, 30.0], lid: 30.2, bounce: 30.5 },
-  s6: { fly: [32.6, 35.8] },
-  s7: { bubble: 37.4, reach: [39.4, 40.1], person: 40.3, ahem: 40.6, retract: [40.6, 41.1], press: 42.3 },
-  s8: { logo: 44.9, tag: 45.8, stats: [46.5, 46.9, 47.3], url: 47.9 },
-  fadeOut: [49.2, 50],
+  duration: 30,
+  bpm: 120,
+  title: { a: 0.25, b: 1.25, out: 2.6 },
+  card: 3.0,
+  items: [3.1, 3.6, 4.1, 4.6, 5.1], // each chip flies for 0.4 s and lands on a beat
+  fly: 0.4,
+  rail: 6.0,
+  scan: [6.5, 8.0],
+  // [active, done] for: banned files, secrets, personal data, tricks, budget, boarding
+  stations: [[7.5, 8.0], [8.5, 9.5], [10.0, 11.5], [12.0, 12.5], [13.5, 15.0], [15.5, 16.0]],
+  secret: [8.5, 8.6, 9.0], // highlight, scramble, wrapped
+  pii: [[10.0, 10.1, 10.5], [10.5, 10.6, 11.0], [11.0, 11.1, 11.5]], // NRIC, phone, email
+  trick: [12.0, 12.5], // flagged, "reported to a person" tag + "Nice try."
+  budget: { in: 13.5, count: [13.75, 14.5], bars: [14.5, 15.25], out: [15.75, 16.25] },
+  split: [16.5, 17.25],
+  plane: [19.0, 20.0],
+  comment: 20.5,
+  decide: 21.5,
+  stamp: 22.5,
+  end: 24.5,
+  stats: [25.5, 26.0, 26.5],
+  url: 27.0,
+  fadeOut: [29.25, 30.0],
 }
