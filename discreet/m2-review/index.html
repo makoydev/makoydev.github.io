@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Discreet M2 Review</title>
+<meta name="description" content="Milestone 2 decision report: Discreet v0.1, a privacy gateway that keeps Singapore personal data away from AI models. What was built, the evidence, every decision and every AI mistake.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:ital,wght@0,400;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #eef1f3; --card: #f9fbfc; --ink: #15212a; --muted: #56646e; --faint: #7d8a92;
+  --line: #cad3d9; --hairline: #e1e6e9; --code-bg: #ffffff;
+  --accent: #0b7a66; --accent-soft: #d5ece6; --on-accent: #ffffff;
+  --amber: #a86400; --amber-soft: #fbe9cc; --ai: #2d58cc; --ai-soft: #dde5fa; --no: #b3261e; --no-soft: #f7dcda;
+  --bar: #0b7a66; --track: #e1e6e9;
+  --shadow: 0 1px 2px rgba(21,33,42,.06), 0 8px 24px rgba(21,33,42,.07);
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "Public Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0e1418; --card: #152027; --ink: #e3e9ed; --muted: #96a4ad; --faint: #75848d;
+    --line: #283740; --hairline: #22303a; --code-bg: #10191e;
+    --accent: #45c4a8; --accent-soft: #123a33; --on-accent: #062019;
+    --amber: #eaa643; --amber-soft: #3a2a10; --ai: #88a4f7; --ai-soft: #1c2748; --no: #f08a82; --no-soft: #3d1b19;
+    --bar: #45c4a8; --track: #22303a;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e1418; --card: #152027; --ink: #e3e9ed; --muted: #96a4ad; --faint: #75848d;
+  --line: #283740; --hairline: #22303a; --code-bg: #10191e;
+  --accent: #45c4a8; --accent-soft: #123a33; --on-accent: #062019;
+  --amber: #eaa643; --amber-soft: #3a2a10; --ai: #88a4f7; --ai-soft: #1c2748; --no: #f08a82; --no-soft: #3d1b19;
+  --bar: #45c4a8; --track: #22303a;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 3px; }
+code { font-family: var(--mono); font-size: .88em; background: var(--code-bg); border: 1px solid var(--hairline); border-radius: 5px; padding: 0 4px; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 720px) { .wrap { padding: 0 28px; } }
+header { padding: 34px 0 6px; }
+.kicker { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.theme { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); padding: 3px 11px; cursor: pointer; }
+h1 { font-family: var(--display); font-stretch: 85%; font-weight: 850; font-size: clamp(34px, 6vw, 62px); line-height: .98; letter-spacing: -.02em; margin: 14px 0 12px; }
+h1 em { font-style: normal; color: var(--accent); }
+.lede { font-size: clamp(17px, 2vw, 20px); max-width: 800px; margin: 0 0 12px; }
+.status { display: inline-flex; gap: 8px; align-items: center; background: var(--amber-soft); border-radius: 999px; padding: 6px 14px; font-weight: 700; font-size: 14px; }
+h2 { font-family: var(--display); font-stretch: 90%; font-weight: 800; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.1; margin: 48px 0 6px; }
+h2 .n { font-family: var(--mono); font-size: 14px; color: var(--accent); margin-right: 8px; font-weight: 600; vertical-align: middle; }
+.sub { color: var(--muted); margin: 0 0 16px; max-width: 800px; }
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: var(--shadow); padding: 18px 20px; min-width: 0; }
+.tiles { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.tile { background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: var(--shadow); padding: 14px 16px; }
+.tile .v { font-family: var(--display); font-stretch: 90%; font-weight: 850; font-size: 34px; line-height: 1.05; }
+.tile .k { color: var(--muted); font-size: 14px; }
+.tblwrap { overflow-x: auto; background: var(--card); border: 1px solid var(--hairline); border-radius: 14px; box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--hairline); }
+th { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--code-bg); }
+tr:last-child td { border-bottom: 0; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.flow { display: grid; gap: 10px; grid-template-columns: minmax(0,1fr); }
+@media (min-width: 760px) { .flow { grid-template-columns: 1fr 1.6fr 1fr; align-items: stretch; } }
+.flow .box { border: 2px solid var(--line); border-radius: 12px; padding: 12px; background: var(--code-bg); font-size: 14.5px; }
+.flow .box.gw { border-color: var(--accent); background: var(--accent-soft); }
+.flow .box b { display: block; margin-bottom: 4px; }
+.example { font-family: var(--mono); font-size: 13.5px; display: grid; gap: 4px; margin-top: 12px; }
+.example div { display: grid; grid-template-columns: 130px 1fr; gap: 10px; }
+@media (max-width: 560px) { .example div { grid-template-columns: 1fr; gap: 0; } }
+.example span.k { font-family: var(--body); color: var(--muted); font-size: 13px; }
+.tok { background: var(--ink); color: var(--paper); border-radius: 4px; padding: 0 4px; }
+/* Bar chart: recall per entity, one series */
+.chart { padding: 18px 20px; }
+.chart h3 { margin: 0; font-size: 16px; }
+.chart .chart-sub { color: var(--muted); font-size: 13.5px; margin: 2px 0 14px; }
+.bars { display: grid; gap: 8px; }
+.barrow { display: grid; grid-template-columns: 74px minmax(0,1fr) 54px; gap: 10px; align-items: center; font-size: 14px; }
+.barrow .lab { font-family: var(--mono); font-size: 12.5px; color: var(--muted); }
+.barrow .track { height: 14px; background: var(--track); border-radius: 4px; position: relative; }
+.barrow .fill { height: 100%; background: var(--bar); border-radius: 0 4px 4px 0; }
+.barrow:hover .fill, .barrow:focus-within .fill { filter: brightness(1.12); }
+.barrow .val { font-variant-numeric: tabular-nums; font-weight: 700; text-align: right; }
+.barrow .tip { position: absolute; left: 0; top: -30px; background: var(--ink); color: var(--paper); font-size: 12px; padding: 3px 8px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .1s; }
+.barrow:hover .tip, .barrow:focus .tip { opacity: 1; }
+.barrow:focus { outline: 2px solid var(--ai); outline-offset: 3px; border-radius: 4px; }
+details.tv summary { cursor: pointer; color: var(--muted); font-size: 14px; margin-top: 12px; }
+.grid2 { display: grid; gap: 14px; grid-template-columns: minmax(0,1fr); }
+@media (min-width: 860px) { .grid2 { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+.you { background: var(--amber-soft); border-color: transparent; }
+.you ol { margin: 6px 0 0; padding-left: 22px; }
+.you li { margin: 7px 0; }
+ul.plain { margin: 6px 0 0; padding-left: 20px; }
+ul.plain li { margin: 5px 0; }
+.tag { display: inline-block; font-size: 12px; font-weight: 700; border-radius: 999px; padding: 1px 9px; white-space: nowrap; }
+.tag.done { background: var(--accent-soft); color: var(--accent); }
+.tag.wait { background: var(--amber-soft); color: var(--amber); }
+footer { color: var(--muted); font-size: 14px; padding: 36px 0 60px; border-top: 1px solid var(--line); margin-top: 52px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="kicker"><span>AI Governance Toolkit · Milestone 2 decision report</span><button type="button" class="theme" id="theme">Theme</button></div>
+    <h1>Discreet v0.1: <em>personal data stays out of the AI.</em></h1>
+    <p class="lede">The second control in the toolkit is built: a privacy gateway that swaps Singapore personal data for placeholders before a request reaches an AI model, puts it back in the answer, refuses decisions about people's eligibility, and keeps a log nobody can quietly edit. Planned 2 Oct, built by 5 Oct, due 22 Nov.</p>
+    <span class="status">● Built and merged into <code>next</code> · awaiting Michael's review</span>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2><span class="n">01</span>At a glance</h2>
+  <div class="tiles">
+    <div class="tile"><div class="v">11 / 13</div><div class="k">issues done; 2 wait for your Fly.io account and for 14 Oct</div></div>
+    <div class="tile"><div class="v">0</div><div class="k">personal data values reached the model in gateway tests, logs scanned too</div></div>
+    <div class="tile"><div class="v">369 / 369</div><div class="k">shared test cases pass in Go, written separately from the TypeScript version</div></div>
+    <div class="tile"><div class="v">100%</div><div class="k">recall on every supported writing style (76.5% over a deliberately varied mix)</div></div>
+    <div class="tile"><div class="v">~3 ms</div><div class="k">added per request; 2.9 ms of it is saving the audit record to disk</div></div>
+    <div class="tile"><div class="v">US$0</div><div class="k">spent; at most US$0.0076 a request and US$0.20 a day with a real model</div></div>
+  </div>
+
+  <h2><span class="n">02</span>What Discreet does</h2>
+  <p class="sub">An app that already talks to OpenAI uses Discreet by changing one setting. Checked with OpenAI's own Python library.</p>
+  <div class="card">
+    <div class="flow">
+      <div class="box"><b>The app</b>Sends a normal chat request, plus a header saying what it's for (for example "claims summary").</div>
+      <div class="box gw"><b>Discreet</b>Refuses eligibility decisions · finds NRIC, phone, email, card, postal code, unit number, date of birth · swaps them for placeholders · keeps the real values encrypted for minutes · writes an audit record.</div>
+      <div class="box"><b>The AI model</b>A free mock for everyone; a real model only for holders of an access token, under a daily budget.</div>
+    </div>
+    <div class="example">
+      <div><span class="k">App sends</span><span>Call S1234567D on 9123 4567 about claim C-2041</span></div>
+      <div><span class="k">AI sees</span><span>Call <span class="tok">&lt;NRIC_1&gt;</span> on <span class="tok">&lt;PHONE_1&gt;</span> about claim C-2041</span></div>
+      <div><span class="k">App gets back</span><span>…S1234567D… 9123 4567… plus a footer saying personal data was replaced</span></div>
+    </div>
+    <p class="sub" style="margin:12px 0 0;font-size:13.5px">The NRIC is the synthetic worked example from sg-pii-rules. Card numbers are redacted and never put back.</p>
+  </div>
+
+  <h2><span class="n">03</span>What was built</h2>
+  <p class="sub">One pull request per issue, each with CI (race-checked tests, <code>govulncheck</code>, CodeQL, a container smoke test), reviewed by Vetted, merged into <code>next</code> by Claude Code with the <code>ai-merged</code> label.</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>Issue</th><th>In plain words</th><th>Pull request</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr><td>D1</td><td>Go project, checks in CI, evidence files</td><td><a href="https://github.com/makoydev/discreet/pull/4">discreet#4</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>P1</td><td>New rules: payment cards, postal codes, unit numbers</td><td><a href="https://github.com/makoydev/sg-pii-rules/pull/11">#11</a> <a href="https://github.com/makoydev/sg-pii-rules/pull/12">#12</a> <a href="https://github.com/makoydev/sg-pii-rules/pull/13">#13</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>P2</td><td>Dates of birth; release candidate sg-pii-rules v0.2.0-rc.1</td><td><a href="https://github.com/makoydev/sg-pii-rules/pull/14">sg-pii-rules#14</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D3</td><td>Go detection engine passing all 369 shared cases</td><td><a href="https://github.com/makoydev/discreet/pull/5">discreet#5</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D4</td><td>Placeholders, encrypted vault, YAML policy</td><td><a href="https://github.com/makoydev/discreet/pull/6">discreet#6</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D7</td><td>Tamper-evident audit log with <code>verify</code> and CSV export</td><td><a href="https://github.com/makoydev/discreet/pull/7">discreet#7</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D5</td><td>The gateway, mock model, purpose refusal, footer</td><td><a href="https://github.com/makoydev/discreet/pull/8">discreet#8</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D6</td><td>Real model behind access tokens, budget, rate limit</td><td><a href="https://github.com/makoydev/discreet/pull/9">discreet#9</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D8</td><td>Four-pane demo page</td><td><a href="https://github.com/makoydev/discreet/pull/10">discreet#10</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D9</td><td>Benchmark and latency</td><td><a href="https://github.com/makoydev/discreet/pull/11">discreet#11</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>D10</td><td>Container, Fly.io config, deploy workflow</td><td><a href="https://github.com/makoydev/discreet/pull/12">discreet#12</a></td><td><span class="tag wait">ready; needs your Fly.io account</span></td></tr>
+      <tr><td>D11</td><td>Controls matrix, threat model review, risks, CV numbers, pilot numbers, this report</td><td><a href="https://github.com/makoydev/discreet/pull/14">discreet#14</a> · <a href="https://github.com/makoydev/vetted/pull/45">vetted#45</a> · <a href="https://github.com/makoydev/sg-pii-rules/pull/16">sg-pii-rules#16</a></td><td><span class="tag done">merged</span></td></tr>
+      <tr><td>V1</td><td>Vetted pilot on Discreet: shadow → opt-in</td><td><a href="https://github.com/makoydev/discreet/pull/13">discreet#13</a></td><td><span class="tag wait">waits for 14 Oct</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="n">04</span>The evidence</h2>
+  <p class="sub">5,000 synthetic samples from a generator written separately from the rules, on purpose including ways of writing personal data the rules don't handle yet. A value counts as caught only if it's covered completely.</p>
+  <div class="grid2">
+    <div class="card chart" role="group" aria-labelledby="ch-t">
+      <h3 id="ch-t">Recall per kind of personal data</h3>
+      <p class="chart-sub">Share of true values fully caught, on 5,000 samples (7,531 values). Every supported writing style scored 100%; the gaps are styles not supported yet.</p>
+      <div class="bars" id="bars"></div>
+      <details class="tv"><summary>Show as a table</summary>
+        <table style="margin-top:8px"><thead><tr><th>Entity</th><th>Caught / total</th><th>Precision</th></tr></thead><tbody id="tv"></tbody></table>
+      </details>
+    </div>
+    <div class="card">
+      <h3 style="margin:0 0 6px;font-size:16px">What the misses are</h3>
+      <ul class="plain">
+        <li>NRICs written <code>S 1234567 D</code> or with hyphens</li>
+        <li>Phones written <code>91 23 45 67</code> or <code>912 34567</code></li>
+        <li>Cards with double spaces between groups</li>
+        <li>Emails written "name at example dot com"</li>
+        <li>Postal codes with no clue, or after "S'pore"</li>
+        <li>Unit numbers without <code>#</code></li>
+        <li>Dates of birth after "Birthday", with words in between, or with a two-digit year</li>
+      </ul>
+      <p class="sub" style="margin:10px 0 0;font-size:14px"><b>False alarms:</b> 482, all bare eight-digit order and batch numbers read as phone numbers, the trade-off accepted in sg-pii-rules ADR 0007. No other kind had any. Precision overall 92.3%.</p>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:14px">
+    <div class="tblwrap"><table>
+      <thead><tr><th>Latency (2,000 requests)</th><th>p50</th><th>p95</th></tr></thead>
+      <tbody>
+        <tr><td>Baseline: same HTTP and JSON work, no Discreet</td><td class="num">0.04 ms</td><td class="num">0.11 ms</td></tr>
+        <tr><td>Through Discreet</td><td class="num">3.05 ms</td><td class="num">4.90 ms</td></tr>
+        <tr><td>of which: detection</td><td class="num">0.08 ms</td><td class="num">0.23 ms</td></tr>
+        <tr><td>of which: audit record saved to disk</td><td class="num">2.88 ms</td><td class="num">3.63 ms</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tblwrap"><table>
+      <thead><tr><th>Vetted's pilot on Discreet</th><th>Count</th></tr></thead>
+      <tbody>
+        <tr><td>Pull requests reviewed (shadow, mock model)</td><td class="num">12 (37 runs)</td></tr>
+        <tr><td>Secret-shaped strings scrubbed before the model</td><td class="num">18</td></tr>
+        <tr><td>Personal data values scrubbed before the model</td><td class="num">89</td></tr>
+        <tr><td>Comments posted / cost</td><td class="num">0 / US$0</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <p class="sub" style="margin-top:12px">All values were synthetic. Synthetic data flatters rule-based detectors, so treat recall as an upper bound for the styles covered. Full numbers and method: <a href="https://github.com/makoydev/discreet/blob/next/EVALS.md">Discreet's EVALS.md</a>.</p>
+
+  <h2><span class="n">05</span>Decisions to review</h2>
+  <p class="sub">Each is an ADR marked "drafted by Claude Code, awaiting Michael's review". Reply "approve", or name the ones to change.</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>ADR</th><th>Decision, in one line</th><th>What you might change</th></tr></thead>
+    <tbody>
+      <tr><td>Discreet 0001</td><td>Go's standard library only, no web framework: one small binary, little to explain or patch</td><td>-</td></tr>
+      <tr><td>Discreet 0002</td><td>Same <code>next</code> integration-branch workflow as Vetted</td><td>-</td></tr>
+      <tr><td>Discreet 0003</td><td>The rules are compiled into the binary from a checksummed sg-pii-rules release</td><td>-</td></tr>
+      <tr><td>Discreet 0004</td><td>Numbered placeholders per request; values encrypted in memory for at most 10 minutes; strict YAML policy; cards redacted by default</td><td>Whether cards should be tokenised instead</td></tr>
+      <tr><td>Discreet 0005</td><td>Plain-text audit log where each line holds the previous line's fingerprint; prompts stored only as keyed fingerprints; limits stated</td><td>When to anchor the head hash externally (M3)</td></tr>
+      <tr><td>Discreet 0006</td><td>Callers must state a purpose; eligibility and benefits decisions refused before any model call; only known fields forwarded; footer on every answer</td><td>The refused-purpose wording</td></tr>
+      <tr><td>Discreet 0007</td><td>Real model only with an access token; one pinned model; each request reserves its worst-case cost against US$0.20 a day; 30 requests a minute per address</td><td>Budget and rate defaults</td></tr>
+      <tr><td>Discreet 0008</td><td>The demo page runs the API's own code path, always on the mock</td><td>-</td></tr>
+      <tr><td>Discreet 0009</td><td>Public demo mock-only on one small Fly.io machine in Singapore, in a no-shell, non-root container</td><td>Region or app name</td></tr>
+      <tr><td>sg-pii-rules 0009</td><td>Cards need both the Luhn check and a card network's prefix and length</td><td>-</td></tr>
+      <tr><td>sg-pii-rules 0010</td><td>A rule can require context (like "Singapore") without redacting it</td><td>-</td></tr>
+      <tr><td>sg-pii-rules 0011</td><td>Postal codes only after an address clue</td><td>-</td></tr>
+      <tr><td>sg-pii-rules 0012</td><td>Dates of birth only right after a birth clue; the check never uses today's date</td><td>-</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="n">06</span>What the AI got wrong, and how it was caught</h2>
+  <p class="sub">All logged in the repositories' build logs. None reached <code>next</code> uncaught.</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th>What went wrong</th><th>Caught by</th></tr></thead>
+    <tbody>
+      <tr><td>A fake cloud key for the Vetted film contained a "9", which real keys never do</td><td>Running the sample through the real engine before animating</td></tr>
+      <tr><td>Checksums regenerated before the formatter rewrote a file; push and PR steps not chained after the commit</td><td>The gate script refused to commit</td></tr>
+      <tr><td>A release was created with a short commit ID and failed, while an unchained command closed its issue anyway</td><td>Reading the output straight away; release created a minute later, issue corrected</td></tr>
+      <tr><td>Two deliberate "break it" tests were written wrongly (one unbalanced bracket, one Go compile error), so they proved nothing at first</td><td>Suspiciously low failure counts; both redone so they test the real thing</td></tr>
+      <tr><td>The mock model said "exactly as a real model would see it" above text the reader sees restored</td><td>Reading the reply in OpenAI's Python client</td></tr>
+      <tr><td>A test searched JSON-escaped text for <code>&lt;NRIC_1&gt;</code></td><td>The failing test, read before touching gateway code</td></tr>
+      <tr><td>The merge script stopped waiting before CI had started</td><td>It then refused to merge, the safe outcome; it now waits for every required check</td></tr>
+      <tr><td>A local check piped JSON through zsh's <code>echo</code>, which mangled it</td><td>The parse error, checked against the raw response</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2><span class="n">07</span>Left out, or not finished</h2>
+  <div class="card"><ul class="plain">
+    <li><b>The public deployment</b> (D10) is ready but needs your Fly.io account. The container was built and smoke-tested locally and in CI.</li>
+    <li><b>The pilot switch</b> (V1) waits for 14 Oct, the end of the two-week shadow period.</li>
+    <li><b>No real model has been called.</b> Everything ran on the mock because <code>OPENAI_API_KEY</code> isn't set; Ollama is supported by configuration but untested against a real one.</li>
+    <li><b>Vetted still uses sg-pii-rules v0.1.0</b>, so Discreet's synthetic cards, postal codes, unit numbers and dates of birth reached Vetted's mock model unscrubbed. Upgrade in M3.</li>
+    <li><b>The shared tests had no case for the overlap tie-break</b>; each implementation tests it, and <a href="https://github.com/makoydev/vetted/issues/44">vetted#44</a> tracks adding shared cases.</li>
+    <li><b>Milestone 3 per the brief:</b> hold-for-review queue, <code>sg-healthcare</code> and <code>sg-finance</code> presets, Project Moonshot run, Vetted's dashboard, v1.0 of both, the toolkit page. Names (NER) after v1.</li>
+  </ul></div>
+
+  <h2><span class="n">08</span>Your part</h2>
+  <div class="card you"><ol>
+    <li><b>Review the three pull requests</b> (about 30 minutes): <a href="https://github.com/makoydev/discreet/pull/15">discreet#15</a>, <a href="https://github.com/makoydev/sg-pii-rules/pull/17">sg-pii-rules#17</a>, <a href="https://github.com/makoydev/vetted/pull/46">vetted#46</a>. Try the demo with Docker (instructions in discreet#15).</li>
+    <li><b>Decide on the 13 decisions</b> above: reply "approve", or name the ones to change.</li>
+    <li><b>Merge</b> each with rebase merge, or tell me to. Then I tag <b>Discreet v0.1.0</b> and <b>sg-pii-rules v0.2.0</b> (byte-identical to the release candidate) and realign the <code>next</code> branches.</li>
+    <li><b>Set up Fly.io</b> (about 10 minutes, <a href="https://github.com/makoydev/discreet/blob/next/docs/DEPLOY.md">docs/DEPLOY.md</a>): account, app, volume, key, deploy token. The deploy then runs from <code>main</code> and tests the live site.</li>
+    <li><b>Set <code>OPENAI_API_KEY</code></b> with a project spend limit, so the pilot and Discreet can produce real-model numbers.</li>
+    <li><b>On or after 14 Oct</b>, say "merge V1", or I'll merge it in the next session after that date.</li>
+  </ol></div>
+</main>
+
+<footer>
+  <div class="wrap">AI Governance Toolkit · Milestone 2 decision report for Michael Mendoza's review · drafted by Claude Code on 5 October 2026. Previous: <a href="https://makoydev.github.io/vetted/m1-review/">Milestone 1 report</a> · <a href="https://makoydev.github.io/vetted/">Vetted</a> · <a href="https://github.com/makoydev/discreet">Discreet</a> · <a href="https://github.com/makoydev/sg-pii-rules">sg-pii-rules</a></div>
+</footer>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme');
+  function theme() { return root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  function label() { btn.textContent = theme() === 'dark' ? 'Light theme' : 'Dark theme'; }
+  label();
+  btn.addEventListener('click', function () { root.setAttribute('data-theme', theme() === 'dark' ? 'light' : 'dark'); label(); });
+
+  // Measured on 2026-10-05 (Discreet EVALS.md): caught / total, precision.
+  var DATA = [
+    ['EMAIL', 996, 1083, '100%'], ['CARD', 933, 1075, '100%'], ['NRIC', 880, 1105, '100%'], ['PHONE', 856, 1112, '64.0%'],
+    ['POSTAL', 779, 1058, '100%'], ['UNIT', 702, 1054, '100%'], ['DOB', 614, 1044, '100%']
+  ];
+  var bars = document.getElementById('bars'), tv = document.getElementById('tv');
+  DATA.forEach(function (d) {
+    var pct = 100 * d[1] / d[2];
+    var row = document.createElement('div'); row.className = 'barrow'; row.tabIndex = 0;
+    row.setAttribute('aria-label', d[0] + ': ' + pct.toFixed(1) + '% caught, ' + d[1] + ' of ' + d[2]);
+    var lab = document.createElement('span'); lab.className = 'lab'; lab.textContent = d[0];
+    var track = document.createElement('div'); track.className = 'track';
+    var fill = document.createElement('div'); fill.className = 'fill'; fill.style.width = pct.toFixed(1) + '%';
+    var tip = document.createElement('span'); tip.className = 'tip'; tip.textContent = d[1] + ' of ' + d[2] + ' caught · precision ' + d[3];
+    track.appendChild(fill); track.appendChild(tip);
+    var val = document.createElement('span'); val.className = 'val'; val.textContent = pct.toFixed(1) + '%';
+    row.appendChild(lab); row.appendChild(track); row.appendChild(val); bars.appendChild(row);
+    var tr = document.createElement('tr');
+    [d[0], d[1] + ' / ' + d[2], d[3]].forEach(function (c) { var td = document.createElement('td'); td.textContent = c; tr.appendChild(td); });
+    tv.appendChild(tr);
+  });
+})();
+</script>
+</body>
+</html>
