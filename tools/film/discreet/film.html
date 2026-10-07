@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Discreet Film</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root { --bg: #0b1115; --panel: #111b21; --card: #16232b; --ink: #e8eef2; --muted: #93a2ab; --line: #26353f; --accent: #45c4a8; --accent-soft: #123a33; --no: #f08a82; --no-soft: #3d1b19; --pii: #c9a0f0; --pii-soft: #2e1f3d; --amber: #eaa643; --ai: #88a4f7; --ai-soft: #1c2748; }
+html, body { margin: 0; width: 1920px; height: 1080px; overflow: hidden; background: var(--bg); }
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: "Public Sans", sans-serif; color: var(--ink); background: var(--bg); }
+#cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+.abs { position: absolute; left: 0; top: 0; will-change: transform, opacity; }
+#grid { width: 1920px; height: 1080px; background-image: radial-gradient(rgba(255,255,255,.07) 1.5px, transparent 1.6px); background-size: 48px 48px; }
+.blob { width: 900px; height: 900px; border-radius: 50%; filter: blur(140px); opacity: .3; }
+#vignette { width: 1920px; height: 1080px; background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,.55) 100%); }
+#fade { width: 1920px; height: 1080px; background: #000; opacity: 0; }
+.title { width: 1920px; text-align: center; font-family: "Archivo", sans-serif; font-stretch: 85%; font-weight: 850; letter-spacing: -.02em; line-height: 1; }
+.title span { display: inline-block; margin: 0 .12em; }
+#t1 { top: 380px; font-size: 84px; }
+#t2 { top: 505px; font-size: 84px; color: var(--accent); }
+
+/* The two sides */
+.panel { width: 640px; height: 640px; background: var(--panel); border: 2px solid var(--line); border-radius: 28px; box-shadow: 0 30px 80px rgba(0,0,0,.45); opacity: 0; }
+.panel .hd { display: flex; align-items: center; gap: 12px; padding: 18px 24px; border-bottom: 2px solid var(--line); font-size: 26px; font-weight: 800; }
+.panel .hd small { margin-left: auto; font-size: 17px; font-weight: 700; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+#aip .hd { color: var(--ai); }
+#ainote { font-size: 30px; font-weight: 900; color: var(--muted); text-align: center; width: 640px; opacity: 0; }
+
+/* The wall */
+#wall { width: 120px; height: 680px; border-radius: 30px; opacity: 0;
+  background: repeating-linear-gradient(180deg, rgba(69,196,168,.22) 0 6px, rgba(69,196,168,.06) 6px 14px);
+  border: 4px solid var(--accent); box-shadow: 0 0 60px rgba(69,196,168,.45), inset 0 0 30px rgba(69,196,168,.25); }
+#walltab { background: var(--accent); color: #062019; font-weight: 900; font-size: 24px; letter-spacing: .1em; padding: 8px 18px; border-radius: 14px; white-space: nowrap; opacity: 0; }
+#wallflash { width: 120px; height: 680px; border-radius: 30px; background: radial-gradient(ellipse at center, rgba(255,255,255,.55), transparent 70%); opacity: 0; }
+
+#vault { width: 250px; background: #0f181e; border: 3px solid var(--pii); border-radius: 20px; padding: 12px 14px; text-align: center; box-shadow: 0 16px 50px rgba(0,0,0,.6); opacity: 0; }
+#vault .lock { font-size: 40px; line-height: 1; }
+#vault .lab { font-weight: 800; font-size: 19px; margin-top: 4px; }
+#vault .sub { color: var(--muted); font-size: 15px; }
+#vault .dots { margin-top: 6px; display: flex; justify-content: center; gap: 6px; min-height: 22px; }
+#vault .dots i { display: block; width: 52px; height: 18px; border-radius: 6px; background: var(--pii-soft); border: 2px solid var(--pii); opacity: 0; }
+.chip { font-family: "JetBrains Mono", monospace; font-size: 20px; font-weight: 700; background: var(--pii-soft); color: var(--pii); border: 2px solid var(--pii); border-radius: 10px; padding: 3px 10px; white-space: nowrap; opacity: 0; }
+
+/* Chat bubbles: each message exists twice, the app's version and the AI's
+   version, and the wall decides which part of which you see. */
+.bubble { width: 540px; border-radius: 20px; padding: 16px 20px 18px; box-sizing: border-box; font-size: 25px; line-height: 1.55; box-shadow: 0 14px 40px rgba(0,0,0,.4); }
+.bubble.appv { background: #1b2a33; border: 2px solid #2c4350; }
+.bubble.aiv { background: var(--ai-soft); border: 2px solid var(--ai); }
+.bubble .meta { font-family: "JetBrains Mono", monospace; font-size: 17px; color: var(--accent); margin-bottom: 8px; }
+.bubble .meta.bad { color: var(--no); }
+.bubble .txt { display: block; }
+.v { white-space: nowrap; font-family: "JetBrains Mono", monospace; font-size: 23px; font-weight: 700; border-radius: 6px; padding: 0 4px; }
+.appv .v { color: #fff; background: rgba(234,166,67,.18); box-shadow: inset 0 -3px 0 var(--amber); }
+.appv .v.restored { background: var(--pii-soft); color: var(--pii); box-shadow: inset 0 -3px 0 var(--pii); }
+.aiv .v { background: #d7dee3; color: #0b1115; }
+.v.red { background: var(--no-soft) !important; color: var(--no) !important; box-shadow: none !important; outline: 2px solid var(--no); }
+.foot { display: block; margin-top: 10px; padding-top: 8px; border-top: 2px dashed #2c4350; font-size: 17px; line-height: 1.35; color: var(--muted); }
+
+#stamp { font-family: "Archivo", sans-serif; font-weight: 900; font-size: 92px; color: var(--no); border: 10px solid var(--no); border-radius: 24px; padding: 4px 34px 10px; background: rgba(11,17,21,.9); text-align: center; line-height: 1; opacity: 0; white-space: nowrap; }
+#stamp small { display: block; font-family: "Public Sans", sans-serif; font-size: 30px; font-weight: 800; margin-top: 6px; }
+
+/* Audit chain */
+.block { width: 330px; background: #0f181e; border: 3px solid var(--line); border-radius: 18px; padding: 14px 18px; font-family: "JetBrains Mono", monospace; font-size: 21px; line-height: 1.5; opacity: 0; }
+.block .seq { color: var(--muted); font-weight: 700; }
+.block .dec { font-weight: 700; color: var(--accent); }
+.block .dec.bad { color: var(--no); }
+.block .h { color: var(--muted); font-size: 18px; }
+.block .h b { color: var(--amber); }
+.block.broken { border-color: var(--no); box-shadow: 0 0 30px rgba(240,138,130,.35); }
+.link { width: 60px; height: 6px; border-radius: 3px; background: var(--accent); opacity: 0; }
+.link.broken { background: var(--no); }
+#edit { color: var(--no); background: var(--no-soft); border-radius: 4px; }
+#cmd { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 700; background: #0f181e; border: 2px solid var(--line); color: var(--ink); border-radius: 16px; padding: 14px 24px; white-space: nowrap; opacity: 0; }
+#result { font-family: "JetBrains Mono", monospace; font-size: 30px; font-weight: 800; background: var(--no); color: #2a0b09; border-radius: 16px; padding: 14px 24px; white-space: nowrap; opacity: 0; }
+#auditTitle { width: 1920px; text-align: center; font-size: 26px; font-weight: 800; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; opacity: 0; }
+
+#cap { width: 1920px; top: 950px; text-align: center; font-size: 42px; font-weight: 700; transform-origin: 50% 50%; }
+#cap span { background: rgba(11,17,21,.75); padding: 10px 26px; border-radius: 16px; }
+#cap em { font-style: normal; color: var(--accent); }
+
+#end { width: 1920px; height: 1080px; opacity: 0; text-align: center; }
+#end .logo { position: absolute; left: 0; right: 0; top: 240px; font-family: "Archivo", sans-serif; font-stretch: 85%; font-weight: 900; font-size: 220px; line-height: 1; letter-spacing: -.03em; }
+#end .logo span { color: var(--accent); }
+#end .tagline { position: absolute; left: 0; right: 0; top: 500px; font-size: 52px; font-weight: 700; }
+#end .tagline em { font-style: normal; color: var(--accent); }
+#end .stats { position: absolute; left: 0; right: 0; top: 630px; display: flex; justify-content: center; gap: 28px; }
+#end .stat { background: var(--card); border: 2px solid var(--line); border-radius: 20px; padding: 22px 34px; min-width: 330px; }
+#end .stat b { display: block; font-family: "Archivo", sans-serif; font-stretch: 90%; font-weight: 850; font-size: 62px; line-height: 1.05; color: var(--accent); }
+#end .stat span { font-size: 24px; color: var(--muted); font-weight: 600; }
+#end .url { position: absolute; left: 0; right: 0; top: 880px; font-family: "JetBrains Mono", monospace; font-size: 40px; font-weight: 700; }
+#end .url span { background: var(--accent); color: #062019; padding: 14px 30px; border-radius: 999px; }
+.spark { width: 14px; height: 14px; border-radius: 50%; }
+.conf { width: 20px; height: 12px; border-radius: 3px; }
+</style>
+</head>
+<body>
+<div id="stage">
+<div id="cam">
+  <div class="abs" id="grid"></div>
+  <div class="abs blob" id="blobA" style="background:#1d6b5c"></div>
+  <div class="abs blob" id="blobB" style="background:#2b3f86"></div>
+  <div class="abs title" id="t1"></div>
+  <div class="abs title" id="t2"></div>
+
+  <div class="abs panel" id="appp"><div class="hd">📱 Claims app<small>your side</small></div></div>
+  <div class="abs panel" id="aip"><div class="hd">🤖 AI model<small>their side</small></div></div>
+  <div class="abs" id="ainote">model not called</div>
+  <div class="abs" id="wall"></div>
+  <div class="abs" id="wallflash"></div>
+  <div class="abs" id="walltab">🛡 DISCREET</div>
+  <div class="abs" id="vault"><div class="lock" id="lock">🔓</div><div class="lab">Vault</div><div class="sub">encrypted · 10 min</div><div class="dots" id="dots"><i></i><i></i><i></i></div></div>
+
+  <div class="abs" id="bubbles"></div>
+  <div class="abs" id="chips"></div>
+  <div class="abs" id="stamp">REFUSED<small>a person decides</small></div>
+
+  <div class="abs" id="auditTitle">The audit log · each record carries the previous record's hash</div>
+  <div class="abs" id="chain"></div>
+  <div class="abs" id="cmd">$ discreet audit verify</div>
+  <div class="abs" id="result">FAILED: record #39 was changed</div>
+
+  <div class="abs" id="cap"><span id="capText"></span></div>
+
+  <div class="abs" id="end">
+    <div class="logo">Discreet<span>.</span></div>
+    <div class="tagline">Use AI on personal data. <em>Without sending it.</em></div>
+    <div class="stats">
+      <div class="stat" id="st1"><b>369 / 369</b><span>shared detection tests pass</span></div>
+      <div class="stat" id="st2"><b>0 values</b><span>reached the model in tests</span></div>
+      <div class="stat" id="st3"><b>~3 ms</b><span>added per request</span></div>
+    </div>
+    <div class="url"><span>github.com/makoydev/discreet</span></div>
+  </div>
+</div>
+  <div class="abs" id="sparks"></div>
+  <div class="abs" id="confetti"></div>
+  <div class="abs" id="vignette"></div>
+  <div class="abs" id="fade"></div>
+</div>
+<script src="timeline.js"></script>
+<script>
+(function () {
+  'use strict';
+  var TL = globalThis.TL;
+  var $ = function (id) { return document.getElementById(id); };
+  var clamp = function (x) { return Math.min(1, Math.max(0, x)); };
+  var p = function (t, a, b) { return clamp((t - a) / (b - a)); };
+  var oc = function (x) { return 1 - Math.pow(1 - x, 3); };
+  var ioc = function (x) { return x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2; };
+  var ob = function (x) { var c1 = 1.70158, c3 = c1 + 1; return x <= 0 ? 0 : 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  var lerp = function (a, b, x) { return a + (b - a) * x; };
+  function tf(el, x, y, s, o, extra) { el.style.transform = 'translate(' + x + 'px,' + y + 'px) scale(' + (s === undefined ? 1 : s) + ')' + (extra || ''); if (o !== undefined) el.style.opacity = o; }
+  function hash(n) { n = (n ^ 61) ^ (n >>> 16); n = n + (n << 3); n = n ^ (n >>> 4); n = Math.imul(n, 0x27d4eb2d); n = n ^ (n >>> 15); return n >>> 0; }
+  function rnd(i) { return hash(i * 7919 + 13) / 4294967296; }
+
+  var WALL = 960, APP_X = 120, AI_X = 1260, PANEL_Y = 170;
+  // Synthetic values: S1234567D is sg-pii-rules' worked example; the card is
+  // a published test number; the email uses a reserved domain.
+  var V = { nric: 'S1234567D', phone: '9123 4567', card: '4111 1111 1111 1111', email: 'tan.ah.kow@example.com' };
+  var PH = { nric: '<NRIC_1>', phone: '<PHONE_1>', card: '[REDACTED_CARD]', email: '<EMAIL_1>' };
+
+  // A message as parts: text, or [key] for a value.
+  function bubble(parts, version, meta, bad, foot) {
+    var b = document.createElement('div'); b.className = 'abs bubble ' + version;
+    if (meta) { var m = document.createElement('div'); m.className = 'meta' + (bad ? ' bad' : ''); m.textContent = meta; b.appendChild(m); }
+    var txt = document.createElement('span'); txt.className = 'txt'; b.appendChild(txt);
+    var vals = [];
+    parts.forEach(function (part) {
+      if (typeof part === 'string') { txt.appendChild(document.createTextNode(part)); return; }
+      var k = part[0], v = document.createElement('span');
+      v.className = 'v' + (k === 'card' && (version === 'aiv' || part[1]) ? ' red' : '') + (part[1] && k !== 'card' ? ' restored' : '');
+      v.textContent = version === 'aiv' || (part[1] && k === 'card') ? PH[k] : V[k];
+      v.dataset.k = k; txt.appendChild(v); vals.push(v);
+    });
+    if (foot) { var f = document.createElement('span'); f.className = 'foot'; f.textContent = foot; b.appendChild(f); }
+    $('bubbles').appendChild(b);
+    return { el: b, txt: txt, vals: vals, foot: f };
+  }
+  var OUT = ['Member ', ['nric'], ', phone ', ['phone'], '. Card ', ['card'], ' was charged twice. Please draft a reply to ', ['email'], '.'];
+  var REP = ['Hi ', ['nric', 1], ", sorry! We'll call ", ['phone', 1], ' about the double charge on ', ['card', 1], ' and confirm to ', ['email', 1], '.'];
+  var out = { app: bubble(OUT, 'appv', 'purpose: claims summary'), ai: bubble(OUT, 'aiv', 'purpose: claims summary') };
+  var rep = { ai: bubble(REP.map(function (x) { return typeof x === 'string' ? x : [x[0]]; }), 'aiv', 'reply'), app: bubble(REP, 'appv', 'reply', false, 'Personal data was replaced before it reached the AI, and put back afterwards. (Discreet)') };
+  var ref = bubble(['Is ', ['nric'], ' eligible for the household subsidy? Decide yes or no.'], 'appv', 'purpose: automated eligibility decision', true);
+
+  // Audit chain blocks
+  var BLOCKS = [
+    ['#38', 'allowed', 'DOB×1', 'e2b1', '7d09'],
+    ['#39', 'allowed', 'NRIC×1 PHONE×1<br>CARD×1 EMAIL×1', '7d09', '9f3a'],
+    ['#40', 'refused_purpose', '–', '9f3a', '1c7e'],
+    ['#41', 'allowed', 'POSTAL×1', '1c7e', '5b62']
+  ];
+  var blocks = BLOCKS.map(function (b, i) {
+    var d = document.createElement('div'); d.className = 'abs block';
+    d.innerHTML = '<div class="seq"></div><div class="dec"></div><div class="ent"></div><div class="h">prev <b></b></div><div class="h">hash <b></b></div>';
+    d.children[0].textContent = b[0]; d.children[1].textContent = b[1]; if (b[1] !== 'allowed') d.children[1].className = 'dec bad';
+    d.children[2].innerHTML = i === 1 ? 'NRIC×<span id="edit">1</span> PHONE×1<br>CARD×1 EMAIL×1' : b[2];
+    d.children[3].lastChild.textContent = b[3] + '…'; d.children[4].lastChild.textContent = b[4] + '…';
+    $('chain').appendChild(d); return d;
+  });
+  var links = [0, 1, 2].map(function () { var l = document.createElement('div'); l.className = 'abs link'; $('chain').appendChild(l); return l; });
+
+  // Chips that carry real values into the vault and back.
+  var VAULTED = ['nric', 'phone', 'email'];
+  var chips = {}; VAULTED.forEach(function (k) { var c = document.createElement('div'); c.className = 'abs chip'; c.textContent = V[k]; $('chips').appendChild(c); chips[k] = c; });
+
+  function words(el, text) { text.split(' ').forEach(function (w) { var s = document.createElement('span'); s.textContent = w; el.appendChild(s); }); return Array.prototype.slice.call(el.children); }
+  var w1 = words($('t1'), 'Teams want AI’s help with people’s data.');
+  var w2 = words($('t2'), 'Discreet lets them, without giving it away.');
+
+  var sparks = []; for (var i = 0; i < 90; i++) { var sp = document.createElement('div'); sp.className = 'abs spark'; $('sparks').appendChild(sp); sparks.push(sp); }
+  var CONF = ['#45c4a8', '#ffd166', '#c9a0f0', '#88a4f7', '#f08a82', '#ffffff'];
+  var confetti = []; for (var c = 0; c < 80; c++) { var cf = document.createElement('div'); cf.className = 'abs conf'; cf.style.background = CONF[c % CONF.length]; $('confetti').appendChild(cf); confetti.push(cf); }
+
+  var CAPS = [
+    [3.1, 5.9, 'A claims app needs an AI’s help. <em>Its message has real personal details.</em>'],
+    [6.0, 8.4, 'Passing through Discreet, <em>personal data turns into placeholders.</em>'],
+    [8.5, 10.9, 'The real values stay behind, <em>locked in an encrypted vault.</em>'],
+    [11.0, 14.4, 'On the way back, <em>the real details return. Card numbers never do.</em>'],
+    [15.0, 18.6, 'Decisions about people’s eligibility? <em>Refused. A person decides.</em>'],
+    [18.8, 24.2, 'Every request is logged. <em>Change one byte, and verify points to it.</em>']
+  ];
+
+  // Keyframes: the message moves in hops so each value meets the wall on a beat.
+  var outKeys, repKeys, outCross, repCross, refW;
+  function centre(v) { return v.offsetLeft + v.offsetWidth / 2; }
+  window.filmReady = function () {
+    var oc_ = out.app.vals.map(function (v) { return { k: v.dataset.k, x: centre(v), y: v.offsetTop + v.offsetHeight / 2 }; }).sort(function (a, b) { return b.x - a.x; });
+    outCross = oc_;
+    outKeys = [[TL.out.start, APP_X]].concat(oc_.map(function (o, i) { return [TL.out.cross[i], WALL - o.x]; }), [[TL.out.arrive, AI_X]]);
+    var rc = rep.ai.vals.map(function (v) { return { k: v.dataset.k, x: centre(v), y: v.offsetTop + v.offsetHeight / 2 }; }).sort(function (a, b) { return a.x - b.x; });
+    repCross = rc;
+    repKeys = [[TL.back.start, AI_X]].concat(rc.map(function (o, i) { return [TL.back.cross[i], WALL - o.x]; }), [[TL.back.arrive, APP_X]]);
+    refW = ref.el.offsetWidth;
+  };
+  function along(keys, t) {
+    if (t <= keys[0][0]) return keys[0][1];
+    for (var i = 1; i < keys.length; i++) if (t <= keys[i][0]) return lerp(keys[i - 1][1], keys[i][1], ioc(p(t, keys[i - 1][0], keys[i][0])));
+    return keys[keys.length - 1][1];
+  }
+  // Show the app's version left of the wall and the AI's version right of it.
+  function split(pair, x, y, o) {
+    var w = pair.app.el.offsetWidth, local = WALL - x;
+    tf(pair.app.el, x, y, 1, o); tf(pair.ai.el, x, y, 1, o);
+    pair.app.el.style.clipPath = 'inset(-20px ' + Math.max(0, w - local) + 'px -20px -20px)';
+    pair.ai.el.style.clipPath = 'inset(-20px -20px -20px ' + Math.max(0, local) + 'px)';
+  }
+  function burst(base, x, y, t0, t, color) {
+    var dt = t - t0;
+    for (var q = 0; q < 10; q++) {
+      var s = sparks[base + q];
+      if (dt < 0 || dt > 0.5) { s.style.opacity = 0; continue; }
+      var a = (q / 10) * Math.PI * 2 + base, d = 20 + 130 * oc(dt / 0.5);
+      s.style.background = color;
+      s.style.transform = 'translate(' + (x + Math.cos(a) * d * 1.3 - 7) + 'px,' + (y + Math.sin(a) * d * 0.9 - 7) + 'px) scale(' + (1 - dt / 0.5) + ')';
+      s.style.opacity = 1 - dt / 0.5;
+    }
+  }
+
+  window.seek = function (frame) {
+    var t = frame / TL.fps;
+    if (!outKeys) window.filmReady();
+    tf($('blobA'), 200 + Math.sin(t * 0.21) * 160, -200 + Math.cos(t * 0.17) * 120);
+    tf($('blobB'), 1000 + Math.cos(t * 0.19) * 180, 380 + Math.sin(t * 0.23) * 140);
+    $('grid').style.transform = 'translateY(' + (-(t * 6) % 48) + 'px)';
+
+    // Title
+    var tOut = p(t, TL.title.out, TL.title.out + 0.35);
+    w1.forEach(function (w, i) { var a = TL.title.a + i * 0.07, k = oc(p(t, a, a + 0.35)); w.style.opacity = k; w.style.transform = 'translateY(' + (1 - k) * 50 + 'px)'; });
+    w2.forEach(function (w, i) { var a = TL.title.b + i * 0.07, k = oc(p(t, a, a + 0.35)); w.style.opacity = k; w.style.transform = 'translateY(' + (1 - k) * 50 + 'px)'; });
+    tf($('t1'), 0, -ioc(tOut) * 80, 1, 1 - tOut); tf($('t2'), 0, -ioc(tOut) * 80, 1, 1 - tOut);
+
+    // Scene: panels, wall, vault
+    var sIn = ob(p(t, TL.scene, TL.scene + 0.5)), dimA = 1 - 0.88 * p(t, TL.audit.in - 0.3, TL.audit.in), sOut = p(t, TL.end - 0.5, TL.end - 0.1);
+    var sceneO = (t >= TL.scene ? clamp(sIn) : 0) * dimA * (1 - sOut);
+    tf($('appp'), 40 + (1 - clamp(sIn)) * -80, PANEL_Y, 1, sceneO);
+    tf($('aip'), 1240 + (1 - clamp(sIn)) * 80, PANEL_Y, 1, sceneO * (t >= TL.refusal.hit ? 0.45 : 1));
+    tf($('ainote'), 1240, 470, 1, t >= TL.refusal.hit + 0.2 ? p(t, TL.refusal.hit + 0.2, TL.refusal.hit + 0.5) * (1 - p(t, TL.audit.in - 0.3, TL.audit.in)) : 0);
+    var wIn = ob(p(t, TL.scene + 0.25, TL.scene + 0.75));
+    tf($('wall'), WALL - 60, PANEL_Y - 20, 1, (t >= TL.scene + 0.25 ? clamp(wIn) : 0) * dimA * (1 - sOut), '');
+    $('wall').style.transform += ' scaleY(' + lerp(0.2, 1, clamp(wIn)) + ')';
+    $('wall').style.backgroundPosition = '0 ' + (t * 40) + 'px';
+    var wt = $('walltab'); tf(wt, WALL - wt.offsetWidth / 2, PANEL_Y - 44, lerp(0.5, 1, clamp(wIn)), (t >= TL.scene + 0.25 ? clamp(wIn) : 0) * dimA * (1 - sOut));
+    var vIn = ob(p(t, TL.out.start - 0.5, TL.out.start)), vOut = p(t, TL.refusal.in - 0.3, TL.refusal.in);
+    var va = $('vault'); tf(va, WALL - 125, 640, lerp(0.7, 1, clamp(vIn)), (t >= TL.out.start - 0.5 ? clamp(vIn) : 0) * (1 - vOut));
+    var stored = 0; outCross.forEach(function (o, i) { if (o.k !== 'card' && t >= TL.out.cross[i] + 0.4) stored++; });
+    var returned = 0; repCross.forEach(function (o, i) { if (o.k !== 'card' && t >= TL.back.cross[i]) returned++; });
+    Array.prototype.forEach.call($('dots').children, function (d, i) { d.style.opacity = i < stored - returned ? 1 : 0; });
+    $('lock').textContent = stored - returned > 0 ? '🔒' : '🔓';
+
+    // Wall flashes on every crossing
+    var flash = 0;
+    TL.out.cross.concat(TL.back.cross).forEach(function (c) { if (t >= c) flash = Math.max(flash, Math.exp(-(t - c) / 0.12)); });
+    if (t >= TL.refusal.hit) flash = Math.max(flash, Math.exp(-(t - TL.refusal.hit) / 0.2));
+    $('wallflash').style.background = t >= TL.refusal.hit && t < TL.refusal.hit + 0.6 ? 'radial-gradient(ellipse at center, rgba(240,138,130,.75), transparent 70%)' : 'radial-gradient(ellipse at center, rgba(255,255,255,.55), transparent 70%)';
+    tf($('wallflash'), WALL - 60, PANEL_Y - 20, 1, flash * dimA);
+
+    // Outbound message
+    var typed = p(t, TL.type[0], TL.type[1]);
+    var outO = (t >= TL.type[0] ? 1 : 0) * (1 - p(t, TL.refusal.in - 0.5, TL.refusal.in - 0.1));
+    split(out, along(outKeys, t), PANEL_Y + 95, outO);
+    if (t < TL.out.start) out.app.el.style.clipPath = 'inset(-20px ' + (100 - typed * 100) + '% -20px -20px)';
+    outCross.forEach(function (o, i) {
+      var c = TL.out.cross[i], y = PANEL_Y + 95 + o.y;
+      burst(i * 10, WALL, y, c, t, o.k === 'card' ? '#f08a82' : '#ffe08a');
+      if (o.k === 'card') return;
+      var chip = chips[o.k], k = ioc(p(t, c, c + 0.4));
+      if (t >= c && t < c + 0.4) tf(chip, WALL - chip.offsetWidth / 2, lerp(y - 16, 700, k), lerp(1, 0.6, k), 1 - k * 0.6);
+    });
+
+    // The AI's reply, typed on the AI side, then back through the wall
+    var rIn = p(t, TL.reply[0], TL.reply[1]);
+    var repO = (t >= TL.reply[0] ? 1 : 0) * (1 - p(t, TL.refusal.in - 0.5, TL.refusal.in - 0.1));
+    split(rep, along(repKeys, t), PANEL_Y + 340, repO);
+    if (t < TL.back.start) rep.ai.el.style.clipPath = 'inset(-20px ' + (100 - rIn * 100) + '% -20px -20px)';
+    rep.app.foot.style.opacity = p(t, TL.footer, TL.footer + 0.3);
+    repCross.forEach(function (o, i) {
+      var c = TL.back.cross[i], y = PANEL_Y + 340 + o.y;
+      burst(40 + i * 10, WALL, y, c, t, o.k === 'card' ? '#f08a82' : '#d9b8ff');
+      if (o.k === 'card') return;
+      var chip = chips[o.k], k = ioc(p(t, c - 0.35, c));
+      if (t >= c - 0.35 && t < c) tf(chip, WALL - chip.offsetWidth / 2, lerp(700, y - 16, k), lerp(0.6, 1, k), 0.4 + 0.6 * k);
+      else if (!(t >= TL.out.cross[outCross.findIndex(function (q) { return q.k === o.k; })] && t < TL.out.cross[outCross.findIndex(function (q) { return q.k === o.k; })] + 0.4)) chips[o.k].style.opacity = 0;
+    });
+
+    // Refusal: bounces off the wall
+    var fIn = ob(p(t, TL.refusal.in, TL.refusal.in + 0.4)), fOut = p(t, TL.audit.in - 0.3, TL.audit.in);
+    var fx = APP_X;
+    if (t >= TL.refusal.start && t < TL.refusal.hit) fx = lerp(APP_X, WALL - 64 - refW, Math.pow(p(t, TL.refusal.start, TL.refusal.hit), 2));
+    else if (t >= TL.refusal.hit) fx = lerp(WALL - 64 - refW, APP_X, ob(p(t, TL.refusal.hit, TL.refusal.home)));
+    tf(ref.el, fx, PANEL_Y + 200 + (1 - clamp(fIn)) * 40, 1, (t >= TL.refusal.in ? clamp(fIn) : 0) * (1 - fOut));
+    var sk = p(t, TL.refusal.hit, TL.refusal.hit + 0.25), st = $('stamp');
+    tf(st, WALL - st.offsetWidth / 2, PANEL_Y + 380, lerp(2.2, 1, oc(sk)), (t >= TL.refusal.hit ? Math.min(1, sk * 3) : 0) * (1 - fOut), ' rotate(-6deg)');
+
+    // Audit chain, then a tampered byte
+    var aIn = oc(p(t, TL.audit.in, TL.audit.in + 0.4)), aOut = p(t, TL.end - 0.5, TL.end - 0.1), aO = (t >= TL.audit.in ? aIn : 0) * (1 - aOut);
+    tf($('auditTitle'), 0, 250, 1, aO);
+    var broken = t >= TL.audit.fail;
+    blocks.forEach(function (b, i) {
+      var a = TL.audit.blocks[i], k = ob(p(t, a, a + 0.35));
+      tf(b, 150 + i * 420, 330 + (1 - clamp(k)) * 40, lerp(0.7, 1, clamp(k)), (t >= a ? clamp(k * 2) : 0) * (1 - aOut));
+      b.className = 'abs block' + (broken && i === 1 ? ' broken' : '');
+    });
+    links.forEach(function (l, i) {
+      var a = TL.audit.blocks[i + 1];
+      tf(l, 150 + i * 420 + 355, 430, 1, (t >= a ? 1 : 0) * (1 - aOut));
+      l.style.width = (60 * p(t, a, a + 0.25)) + 'px';
+      l.className = 'abs link' + (broken && i >= 1 ? ' broken' : '');
+    });
+    var ed = $('edit'); ed.textContent = t >= TL.audit.edit ? '0' : '1'; ed.style.outline = t >= TL.audit.edit ? '2px solid var(--no)' : 'none';
+    var cm = $('cmd'), ck = ob(p(t, TL.audit.verify, TL.audit.verify + 0.35));
+    tf(cm, WALL - cm.offsetWidth / 2, 650, lerp(0.6, 1, ck), (t >= TL.audit.verify ? clamp(ck * 2) : 0) * (1 - aOut));
+    var rs = $('result'), rk = ob(p(t, TL.audit.fail, TL.audit.fail + 0.35));
+    tf(rs, WALL - rs.offsetWidth / 2, 760, lerp(0.6, 1, rk), (t >= TL.audit.fail ? clamp(rk * 2) : 0) * (1 - aOut));
+
+    // Confetti and camera
+    var cdt = t - (TL.end + 0.1);
+    confetti.forEach(function (cf, i) {
+      if (cdt < 0) { cf.style.opacity = 0; return; }
+      var a = -Math.PI / 2 + (rnd(i) - 0.5) * 2.6, v = 700 + rnd(i + 50) * 900;
+      cf.style.transform = 'translate(' + (960 + Math.cos(a) * v * cdt) + 'px,' + (470 + Math.sin(a) * v * cdt + 0.5 * 1800 * cdt * cdt) + 'px) rotate(' + (cdt * 800 * (rnd(i + 9) - 0.5)) + 'deg)';
+      cf.style.opacity = 1 - p(cdt, 1.6, 2.4);
+    });
+    var accents = TL.out.cross.concat(TL.back.cross, [TL.scene, TL.audit.verify, TL.end]);
+    var bump = 0; accents.forEach(function (a) { if (t >= a) bump += 0.012 * Math.exp(-(t - a) / 0.14); });
+    var shake = 0;
+    [[TL.refusal.hit, 16], [TL.audit.fail, 8]].forEach(function (h) { var d = t - h[0]; if (d >= 0) { shake += h[1] * Math.exp(-d / 0.12); bump += 0.025 * Math.exp(-d / 0.2); } });
+    $('cam').style.transform = 'translate(' + Math.sin(t * 93) * shake + 'px,' + Math.cos(t * 71) * shake + 'px) scale(' + (1 + bump) + ')';
+
+    // Captions
+    var capText = '', capOp = 0, capY = 0, capS = 1;
+    CAPS.forEach(function (c) { if (t >= c[0] && t < c[1]) { capText = c[2]; capOp = Math.min(p(t, c[0], c[0] + 0.2), 1 - p(t, c[1] - 0.25, c[1])); capY = (1 - oc(p(t, c[0], c[0] + 0.3))) * 20; capS = lerp(0.82, 1, ob(p(t, c[0], c[0] + 0.3))); } });
+    if ($('capText').innerHTML !== capText) $('capText').innerHTML = capText;
+    tf($('cap'), 0, capY, capS, capOp);
+
+    // End card
+    var eIn = p(t, TL.end, TL.end + 0.6);
+    $('end').style.opacity = eIn;
+    $('end').querySelector('.logo').style.transform = 'scale(' + lerp(1.15, 1, oc(eIn)) + ')';
+    var tk = oc(p(t, TL.end + 0.5, TL.end + 1.0)), tg = $('end').querySelector('.tagline'); tg.style.opacity = tk; tg.style.transform = 'translateY(' + (1 - tk) * 30 + 'px)';
+    ['st1', 'st2', 'st3'].forEach(function (id, i) { var k = ob(p(t, TL.stats[i], TL.stats[i] + 0.4)), el = $(id); el.style.opacity = p(t, TL.stats[i], TL.stats[i] + 0.2); el.style.transform = 'translateY(' + (1 - k) * 40 + 'px) scale(' + lerp(0.8, 1, k) + ')'; });
+    var uk = ob(p(t, TL.url, TL.url + 0.5)), url = $('end').querySelector('.url'); url.style.opacity = p(t, TL.url, TL.url + 0.2); url.style.transform = 'scale(' + lerp(0.7, 1, uk) + ')';
+
+    $('fade').style.opacity = Math.max(1 - p(t, 0, 0.25), p(t, TL.fadeOut[0], TL.fadeOut[1]));
+  };
+
+  if (/[?&](play|t=)/.test(location.search)) {
+    document.fonts.ready.then(function () {
+      window.filmReady();
+      var m = /[?&]t=([\d.]+)/.exec(location.search);
+      if (m) { window.seek(Math.round(parseFloat(m[1]) * TL.fps)); return; }
+      var t0 = performance.now();
+      (function loop(now) { var f = Math.floor((now - t0) / 1000 * TL.fps); if (f < TL.duration * TL.fps) { window.seek(f); requestAnimationFrame(loop); } })(t0);
+    });
+  }
+})();
+</script>
+</body>
+</html>
