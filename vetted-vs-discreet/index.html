@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src data:; base-uri 'none'; form-action 'none'">
+<title>Vetted vs Discreet</title>
+<meta name="description" content="Vetted and Discreet, the two controls in the AI Governance Toolkit, explained side by side with animated diagrams: what each one guards, how data moves, and what they share.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Public+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;600;700&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #eef1f3; --card: #f9fbfc; --ink: #15212a; --muted: #56646e; --faint: #7d8a92;
+  --line: #cad3d9; --hairline: #e1e6e9; --code-bg: #ffffff;
+  --accent: #0b7a66; --accent-soft: #d5ece6; --on-accent: #ffffff;
+  --vet: #a86400; --vet-soft: #fbe9cc;
+  --dis: #2d58cc; --dis-soft: #dde5fa;
+  --no: #b3261e; --no-soft: #f7dcda; --pii: #7a3fb0; --pii-soft: #efe3f8;
+  --shadow: 0 1px 2px rgba(21,33,42,.06), 0 8px 24px rgba(21,33,42,.07);
+  --display: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --body: "Public Sans", -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #0e1418; --card: #152027; --ink: #e3e9ed; --muted: #96a4ad; --faint: #75848d;
+    --line: #283740; --hairline: #22303a; --code-bg: #10191e;
+    --accent: #45c4a8; --accent-soft: #123a33; --on-accent: #062019;
+    --vet: #eaa643; --vet-soft: #3a2a10; --dis: #88a4f7; --dis-soft: #1c2748;
+    --no: #f08a82; --no-soft: #3d1b19; --pii: #c9a0f0; --pii-soft: #2e1f3d;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #0e1418; --card: #152027; --ink: #e3e9ed; --muted: #96a4ad; --faint: #75848d;
+  --line: #283740; --hairline: #22303a; --code-bg: #10191e;
+  --accent: #45c4a8; --accent-soft: #123a33; --on-accent: #062019;
+  --vet: #eaa643; --vet-soft: #3a2a10; --dis: #88a4f7; --dis-soft: #1c2748;
+  --no: #f08a82; --no-soft: #3d1b19; --pii: #c9a0f0; --pii-soft: #2e1f3d;
+  --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); text-underline-offset: 3px; }
+code { font-family: var(--mono); font-size: .88em; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 0 16px; }
+@media (min-width: 720px) { .wrap { padding: 0 28px; } }
+header { padding: 30px 0 4px; }
+.top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.theme { font-family: var(--mono); font-size: 12px; border: 1px solid var(--line); border-radius: 999px; background: var(--card); color: var(--muted); padding: 3px 11px; cursor: pointer; }
+h1 { font-family: var(--display); font-stretch: 85%; font-weight: 850; font-size: clamp(34px, 6vw, 64px); line-height: .98; letter-spacing: -.02em; margin: 14px 0 12px; }
+h1 .v { color: var(--vet); } h1 .d { color: var(--dis); }
+.lede { font-size: clamp(17px, 2vw, 20px); max-width: 820px; margin: 0; }
+h2 { font-family: var(--display); font-stretch: 90%; font-weight: 800; font-size: clamp(24px, 3.4vw, 34px); line-height: 1.1; margin: 46px 0 6px; }
+.sub { color: var(--muted); margin: 0 0 16px; max-width: 820px; }
+
+/* Summary cards */
+.pair { display: grid; gap: 14px; grid-template-columns: minmax(0, 1fr); margin-top: 22px; }
+@media (min-width: 860px) { .pair { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.card { background: var(--card); border: 1px solid var(--hairline); border-radius: 16px; box-shadow: var(--shadow); padding: 18px 20px; min-width: 0; }
+.card.vet { border-top: 5px solid var(--vet); } .card.dis { border-top: 5px solid var(--dis); }
+.card h3 { font-family: var(--display); font-stretch: 90%; font-size: 30px; margin: 0; line-height: 1.1; }
+.card.vet h3 { color: var(--vet); } .card.dis h3 { color: var(--dis); }
+.card .one { font-size: 19px; font-weight: 700; margin: 6px 0 8px; }
+.card .like { color: var(--muted); margin: 0; }
+.tagrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tag { font-size: 13px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--accent-soft); color: var(--accent); }
+
+/* Animated flow diagrams */
+.flow { position: relative; padding: 14px; }
+.flow .head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+.flow .head h3 { margin: 0; font-size: 20px; }
+.play { border: 1px solid var(--line); background: var(--code-bg); border-radius: 999px; padding: 5px 14px; font: inherit; font-size: 14px; font-weight: 700; color: var(--ink); cursor: pointer; }
+.flows { display: grid; gap: 18px; margin-top: 22px; }
+.stage { position: relative; display: grid; gap: 56px clamp(28px, 7vw, 96px); padding: 22px 6px 10px; }
+.stage svg.arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.node { position: relative; z-index: 1; background: var(--code-bg); border: 2px solid var(--line); border-radius: 14px; padding: 10px 10px; text-align: center; font-size: 14px; font-weight: 700; line-height: 1.25; transition: border-color .25s, box-shadow .25s, transform .25s; min-height: 74px; display: grid; place-items: center; }
+.node .ic { display: block; font-size: 24px; line-height: 1; margin-bottom: 4px; }
+.node small { display: block; font-weight: 600; color: var(--muted); font-size: 12px; margin-top: 2px; }
+.node.guard { border-width: 3px; }
+#vetted .node.guard { border-color: var(--vet); background: var(--vet-soft); }
+#discreet .node.guard { border-color: var(--dis); background: var(--dis-soft); }
+.node.lit { transform: translateY(-2px) scale(1.04); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); border-color: var(--accent); }
+.node.badlit { box-shadow: 0 0 0 4px color-mix(in srgb, var(--no) 30%, transparent); border-color: var(--no); }
+.node .badge { position: absolute; top: -12px; right: -8px; font-size: 11.5px; font-weight: 800; border-radius: 999px; padding: 2px 8px; background: var(--no); color: #fff; opacity: 0; transition: opacity .25s; white-space: nowrap; }
+.node .badge.ok { background: var(--accent); color: var(--on-accent); }
+.node.showbadge .badge { opacity: 1; }
+.packet { position: absolute; z-index: 2; left: 0; top: 0; transform: translate(-50%, -50%); font-family: var(--mono); font-size: 12.5px; font-weight: 700; white-space: nowrap; border-radius: 8px; padding: 3px 8px; background: var(--ink); color: var(--paper); box-shadow: 0 6px 16px rgba(0,0,0,.25); opacity: 0; pointer-events: none; }
+.packet.pii { background: var(--vet); color: #1d1200; }
+.packet.safe { background: var(--accent); color: var(--on-accent); }
+.packet.back { background: var(--pii); color: #fff; }
+.packet.bad { background: var(--no); color: #fff; }
+:root[data-theme="dark"] .packet.back { color: #1a0f26; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .packet.back { color: #1a0f26; } }
+path.arrow { fill: none; stroke: var(--line); stroke-width: 2.5; }
+path.arrow.on { stroke: var(--accent); stroke-dasharray: 7 6; animation: march .6s linear infinite; }
+path.arrow.on.bad { stroke: var(--no); }
+path.arrow.ret { stroke-dasharray: 3 5; }
+@keyframes march { to { stroke-dashoffset: -13; } }
+ol.steps { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 4px 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); counter-reset: s; }
+ol.steps li { counter-increment: s; display: grid; grid-template-columns: 26px 1fr; gap: 8px; align-items: start; font-size: 14.5px; color: var(--muted); padding: 4px 6px; border-radius: 8px; cursor: pointer; transition: background .2s, color .2s; }
+ol.steps li::before { content: counter(s); display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; font-size: 12px; font-weight: 800; background: var(--hairline); color: var(--muted); margin-top: 1px; }
+ol.steps li.now { color: var(--ink); background: var(--accent-soft); }
+ol.steps li.now::before { background: var(--accent); color: var(--on-accent); }
+ol.steps li.now.bad { background: var(--no-soft); }
+ol.steps li.now.bad::before { background: var(--no); color: #fff; }
+
+/* Layouts: four across on wide screens, two across on phones */
+#vetted .stage { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "dev pr gate ai" ". human . ."; }
+#discreet .stage { grid-template-columns: repeat(4, minmax(0, 1fr)); grid-template-areas: "user app gate ai" ". . vault audit"; }
+@media (max-width: 640px) {
+  .stage { gap: 44px 30px; }
+  #vetted .stage { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "dev ." "pr human" "gate ." "ai ."; }
+  #discreet .stage { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-areas: "user ." "app ." "gate vault" "ai audit"; }
+}
+[data-area="dev"] { grid-area: dev; } [data-area="pr"] { grid-area: pr; } [data-area="gate"] { grid-area: gate; } [data-area="ai"] { grid-area: ai; }
+[data-area="human"] { grid-area: human; } [data-area="user"] { grid-area: user; } [data-area="app"] { grid-area: app; } [data-area="vault"] { grid-area: vault; } [data-area="audit"] { grid-area: audit; }
+
+/* Table */
+.tblwrap { overflow-x: auto; background: var(--card); border: 1px solid var(--hairline); border-radius: 16px; box-shadow: var(--shadow); }
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
+th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid var(--hairline); }
+th { font-family: var(--mono); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); font-weight: 600; background: var(--code-bg); }
+th.v { color: var(--vet); } th.d { color: var(--dis); }
+td:first-child { font-weight: 700; width: 22%; }
+tr:last-child td { border-bottom: 0; }
+
+/* Shared foundation */
+.found { position: relative; display: grid; gap: 20px 24px; grid-template-columns: minmax(0,1fr); }
+@media (min-width: 860px) { .found { grid-template-columns: 1fr 1.2fr 1fr; align-items: center; column-gap: 84px; } }
+.found { row-gap: 44px; }
+.fbox { background: var(--card); border: 2px solid var(--line); border-radius: 16px; padding: 16px; text-align: center; box-shadow: var(--shadow); position: relative; z-index: 1; }
+.fbox b { display: block; font-size: 20px; }
+.fbox.vet { border-color: var(--vet); } .fbox.dis { border-color: var(--dis); }
+.fbox.rules { border-color: var(--accent); background: var(--accent-soft); }
+.fbox small { color: var(--muted); font-size: 13.5px; display: block; margin-top: 4px; }
+.fbox .lang { display: inline-block; margin-top: 8px; font-family: var(--mono); font-size: 12px; font-weight: 700; border-radius: 999px; padding: 2px 10px; background: var(--hairline); }
+.found svg { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+.found path { fill: none; stroke: var(--accent); stroke-width: 3; stroke-dasharray: 8 7; animation: march .8s linear infinite; }
+ul.shared { margin: 16px 0 0; padding-left: 20px; } ul.shared li { margin: 5px 0; }
+
+/* Which one */
+.which { display: grid; gap: 12px; grid-template-columns: minmax(0,1fr); }
+@media (min-width: 860px) { .which { grid-template-columns: repeat(3, minmax(0,1fr)); } }
+.which .card p { margin: 6px 0 0; }
+.which .ans { font-weight: 800; margin-top: 10px; display: inline-block; border-radius: 999px; padding: 3px 12px; }
+.ans.v { background: var(--vet-soft); color: var(--vet); } .ans.d { background: var(--dis-soft); color: var(--dis); } .ans.b { background: var(--accent-soft); color: var(--accent); }
+.links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.btn { display: inline-block; border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 8px 16px; font-weight: 650; text-decoration: none; font-size: 14.5px; }
+footer { color: var(--muted); font-size: 14px; padding: 34px 0 56px; border-top: 1px solid var(--line); margin-top: 50px; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="top"><span>AI Governance Toolkit · how the two controls differ</span><button type="button" class="theme" id="theme">Theme</button></div>
+    <h1><span class="v">Vetted</span> and <span class="d">Discreet</span>: two guards, two doors to AI.</h1>
+    <p class="lede">Both stop personal data and secrets from reaching an AI model, and both leave the final say with a person. They guard different doors: Vetted guards <b>code</b> on its way to an AI reviewer; Discreet guards <b>live conversations</b> on their way to an AI model and back.</p>
+    <div class="pair">
+      <div class="card vet">
+        <h3>Vetted</h3>
+        <p class="one">An AI code reviewer with guardrails, for software teams.</p>
+        <p class="like">Like <b>airport security for code</b>: before a code change goes to an AI for review, secrets and personal data are taken out. The AI sends back advice; only a person approves.</p>
+        <div class="tagrow"><span class="tag">GitHub Action</span><span class="tag">TypeScript</span><span class="tag">v0.1.0 · 1 Oct 2026</span></div>
+      </div>
+      <div class="card dis">
+        <h3>Discreet</h3>
+        <p class="one">A privacy gateway for any app that talks to an AI.</p>
+        <p class="like">Like <b>an interpreter who uses code names</b>: people's details become placeholders on the way to the AI, and turn back into the real details in the answer. Some requests are refused outright.</p>
+        <div class="tagrow"><span class="tag">Server (gateway)</span><span class="tag">Go</span><span class="tag">v0.1.0 · 6 Oct 2026</span></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <h2>Watch each one work</h2>
+  <p class="sub">The coloured box is the guard. Follow the packet along the arrows; the steps below each diagram say what's happening. Tap any step to jump to it.</p>
+  <div class="flows">
+    <section class="card flow" id="vetted" aria-labelledby="vt">
+      <div class="head"><h3 id="vt" style="color:var(--vet)">Vetted: one way out, advice back</h3><button type="button" class="play">Pause</button></div>
+      <div class="stage">
+        <svg class="arrows" aria-hidden="true"></svg>
+        <div class="node" data-id="dev" data-area="dev"><span><span class="ic">👩‍💻</span>Developer</span></div>
+        <div class="node" data-id="pr" data-area="pr"><span><span class="ic">📝</span>Pull request<small>on GitHub</small></span></div>
+        <div class="node guard" data-id="gate" data-area="gate"><span><span class="ic">🛡️</span>Vetted<small>runs inside GitHub</small></span></div>
+        <div class="node" data-id="ai" data-area="ai"><span><span class="ic">🤖</span>AI reviewer</span><span class="badge ok">sees no secrets</span></div>
+        <div class="node" data-id="human" data-area="human"><span><span class="ic">🧑‍⚖️</span>A person<small>approves or merges</small></span><span class="badge">AI can't approve</span></div>
+      </div>
+      <ol class="steps"></ol>
+    </section>
+    <section class="card flow" id="discreet" aria-labelledby="dt">
+      <div class="head"><h3 id="dt" style="color:var(--dis)">Discreet: a round trip, details put back</h3><button type="button" class="play">Pause</button></div>
+      <div class="stage">
+        <svg class="arrows" aria-hidden="true"></svg>
+        <div class="node" data-id="user" data-area="user"><span><span class="ic">🧑‍💼</span>Claims officer</span></div>
+        <div class="node" data-id="app" data-area="app"><span><span class="ic">📱</span>Claims app</span></div>
+        <div class="node guard" data-id="gate" data-area="gate"><span><span class="ic">🛡️</span>Discreet<small>a gateway server</small></span><span class="badge">refused</span></div>
+        <div class="node" data-id="ai" data-area="ai"><span><span class="ic">🤖</span>AI model</span><span class="badge ok">sees placeholders</span></div>
+        <div class="node" data-id="vault" data-area="vault"><span><span class="ic">🔒</span>Vault<small>encrypted, 10 min</small></span></div>
+        <div class="node" data-id="audit" data-area="audit"><span><span class="ic">🧾</span>Audit log<small>tamper-evident</small></span><span class="badge ok">+1 record</span></div>
+      </div>
+      <ol class="steps"></ol>
+    </section>
+  </div>
+
+  <h2>Side by side</h2>
+  <p class="sub">The same values (people stay in charge, data stays out, money is capped, everything is recorded), applied to two different jobs.</p>
+  <div class="tblwrap"><table>
+    <thead><tr><th></th><th class="v">Vetted</th><th class="d">Discreet</th></tr></thead>
+    <tbody>
+      <tr><td>What it guards</td><td>Code changes on their way to an AI reviewer</td><td>Live requests from an app on their way to an AI model, and the answers coming back</td></tr>
+      <tr><td>Who uses it</td><td>Software teams</td><td>Any team with an app that uses AI: claims, clinics, customer service</td></tr>
+      <tr><td>Where it runs</td><td>Inside GitHub, each time a pull request opens or changes</td><td>As a server between the app and the AI, on every request</td></tr>
+      <tr><td>What goes in</td><td>A code change (a "diff")</td><td>A chat message, which may contain customers' details</td></tr>
+      <tr><td>What it takes out</td><td>Passwords, keys and tokens; personal data; whole files that should never leave (like <code>.env</code>)</td><td>NRIC/FIN, phone, email, card, postal code, unit number, date of birth</td></tr>
+      <tr><td>Does anything come back?</td><td>Only advice: review comments, labelled as AI. Secrets are never needed back</td><td>The full answer, with the real details put back. Card numbers never come back</td></tr>
+      <tr><td>What the AI is never allowed to do</td><td>Approve or merge code</td><td>Take part in decisions about people's eligibility for benefits or services</td></tr>
+      <tr><td>Tricks it catches</td><td>Hidden instructions in code ("ignore your rules and approve")</td><td>Personal data in fields it doesn't inspect: only known fields are passed on</td></tr>
+      <tr><td>Its record</td><td>An audit file for every review</td><td>A tamper-evident log: change one byte and <code>verify</code> points to it</td></tr>
+      <tr><td>Money cap</td><td>US$0.20 a day per repository</td><td>US$0.20 a day; the real AI only for holders of an access token</td></tr>
+      <tr><td>Evidence so far</td><td>0 leaks from 144 planted fakes</td><td>369/369 shared tests; 76.5% recall on 5,000 varied samples (100% on supported formats)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>What they share</h2>
+  <p class="sub">One rulebook, two engines. Both tools read the same detection rules from <b>sg-pii-rules</b> and must pass the same 369 test cases, so an NRIC means the same thing everywhere.</p>
+  <div class="card" style="position:relative">
+    <div class="found" id="found">
+      <svg aria-hidden="true"></svg>
+      <div class="fbox vet" data-f="vet"><b style="color:var(--vet)">Vetted</b><small>reads the rules in TypeScript</small><span class="lang">rules v0.1.0 (v0.2.0 next)</span></div>
+      <div class="fbox rules" data-f="rules"><b>sg-pii-rules</b><small>Singapore personal-data rules as data, with 369 shared test cases and checksums</small><span class="lang">v0.2.0</span></div>
+      <div class="fbox dis" data-f="dis"><b style="color:var(--dis)">Discreet</b><small>reads the same rules in Go</small><span class="lang">rules v0.2.0</span></div>
+    </div>
+    <ul class="shared">
+      <li><b>The same way of working:</b> every change through a reviewed pull request, decisions written down as records you approved, and a build log of every AI mistake.</li>
+      <li><b>The same principles:</b> AI suggests and people decide; personal data stays out; spending is capped; everything leaves a record.</li>
+    </ul>
+  </div>
+
+  <h2>Which one do I need?</h2>
+  <div class="which">
+    <div class="card"><b>"We want AI to review our pull requests, but our code has keys and test data in it."</b><span class="ans v">Vetted</span></div>
+    <div class="card"><b>"Our claims app wants AI to draft replies, but the messages contain NRICs and phone numbers."</b><span class="ans d">Discreet</span></div>
+    <div class="card"><b>"We build AI features into our products, and we review the code that builds them."</b><span class="ans b">Both: the toolkit</span></div>
+  </div>
+  <div class="links">
+    <a class="btn" href="https://makoydev.github.io/vetted/film/">🎬 Vetted in 30 seconds</a>
+    <a class="btn" href="https://makoydev.github.io/discreet/film/">🎬 Discreet in 30 seconds</a>
+    <a class="btn" href="https://makoydev.github.io/vetted/try/">Try Vetted's rules</a>
+    <a class="btn" href="https://makoydev.github.io/vetted/">Vetted in plain words</a>
+    <a class="btn" href="https://makoydev.github.io/discreet/m2-review/">Discreet's milestone report</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">AI Governance Toolkit by Michael Mendoza · <a href="https://github.com/makoydev/vetted">Vetted</a> · <a href="https://github.com/makoydev/discreet">Discreet</a> · <a href="https://github.com/makoydev/sg-pii-rules">sg-pii-rules</a> · All example data is made up.</div>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var root = document.documentElement, tbtn = document.getElementById('theme');
+  try { var saved = localStorage.getItem('compare-theme'); if (saved === 'light' || saved === 'dark') root.setAttribute('data-theme', saved); } catch (e) {}
+  function theme() { return root.getAttribute('data-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'); }
+  function label() { tbtn.textContent = theme() === 'dark' ? 'Light theme' : 'Dark theme'; }
+  label();
+  tbtn.addEventListener('click', function () { var n = theme() === 'dark' ? 'light' : 'dark'; root.setAttribute('data-theme', n); try { localStorage.setItem('compare-theme', n); } catch (e) {} label(); });
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var NS = 'http://www.w3.org/2000/svg';
+
+  // Each step: an arrow (from, to, lane: 1 forward, -1 return), the packet's
+  // label and style, which node lights up, and the caption.
+  var FLOWS = {
+    vetted: [
+      { from: 'dev', to: 'pr', lane: 1, label: 'code change', cls: '', lit: 'pr', text: 'A developer opens a pull request: a proposed code change.' },
+      { from: 'pr', to: 'gate', lane: 1, label: 'code + 🔑 key + 🪪 NRIC', cls: 'pii', lit: 'gate', text: 'Vetted reads it inside GitHub. Some changes contain passwords, keys or personal data.' },
+      { from: 'gate', to: 'ai', lane: 1, label: 'code + <SECRET> + <NRIC>', cls: 'safe', lit: 'ai', badge: 'ai', text: 'Secrets and personal data are wrapped first. Only the wrapped version goes to the AI.' },
+      { from: 'ai', to: 'gate', lane: -1, label: '💬 review notes', cls: '', lit: 'gate', text: 'The AI sends back review notes. Vetted checks they\'re well-formed before using them.' },
+      { from: 'gate', to: 'pr', lane: -1, label: '💬 3 comments [AI]', cls: '', lit: 'pr', text: 'The notes are posted as comments on the pull request, clearly labelled as AI.' },
+      { from: 'pr', to: 'human', lane: 1, label: '✅ a person decides', cls: 'safe', lit: 'human', badge: 'human', text: 'A person reads them and decides. Vetted can never approve or merge.' }
+    ],
+    discreet: [
+      { from: 'user', to: 'app', lane: 1, label: 'S1234567D · 9123 4567', cls: 'pii', lit: 'app', text: 'A claims officer asks the app to draft a reply. The message includes a member\'s NRIC and phone.' },
+      { from: 'app', to: 'gate', lane: 1, label: 'S1234567D · 9123 4567', cls: 'pii', lit: 'gate', text: 'The app sends it to Discreet, saying why: "claims summary".' },
+      { from: 'gate', to: 'vault', lane: 1, label: 'S1234567D 🔒', cls: 'back', lit: 'vault', text: 'Discreet swaps the details for placeholders. The real values wait in an encrypted vault.' },
+      { from: 'gate', to: 'ai', lane: 1, label: '<NRIC_1> · <PHONE_1>', cls: 'safe', lit: 'ai', badge: 'ai', text: 'The AI only ever sees the placeholders.' },
+      { from: 'ai', to: 'gate', lane: -1, label: 'Hi <NRIC_1>, we\'ll call <PHONE_1>', cls: 'safe', lit: 'gate', text: 'The AI writes its answer using the same placeholders.' },
+      { from: 'vault', to: 'gate', lane: -1, label: 'S1234567D', cls: 'back', lit: 'gate', text: 'Discreet takes the real values back out of the vault…' },
+      { from: 'gate', to: 'app', lane: -1, label: 'Hi S1234567D, we\'ll call 9123 4567', cls: 'back', lit: 'app', text: '…and the app shows the full answer, with the real details put back.' },
+      { from: 'gate', to: 'audit', lane: 1, label: '🧾 +1 record', cls: '', lit: 'audit', badge: 'audit', text: 'Every request, allowed or refused, leaves a line in a log nobody can quietly edit.' },
+      { from: 'app', to: 'gate', lane: 1, label: '⚖️ decide eligibility?', cls: 'bad', lit: 'gate', badge: 'gate', bounce: true, text: 'Asked to decide someone\'s eligibility? Refused before any AI is called. A person decides.' }
+    ]
+  };
+  var STEP_MS = 2300, MOVE_MS = 1300;
+
+  function boxPoint(r, dx, dy) {
+    var hw = r.width / 2 + 6, hh = r.height / 2 + 6;
+    var s = Math.min(dx ? hw / Math.abs(dx) : Infinity, dy ? hh / Math.abs(dy) : Infinity);
+    return { x: r.cx + dx * s, y: r.cy + dy * s };
+  }
+
+  function setup(id) {
+    var sec = document.getElementById(id), stage = sec.querySelector('.stage'), svg = stage.querySelector('svg.arrows');
+    var steps = FLOWS[id], list = sec.querySelector('ol.steps'), btn = sec.querySelector('.play');
+    var nodes = {}; Array.prototype.forEach.call(stage.querySelectorAll('.node'), function (n) { nodes[n.dataset.id] = n; });
+    var packet = document.createElement('div'); packet.className = 'packet'; stage.appendChild(packet);
+    var defs = document.createElementNS(NS, 'defs');
+    ['line', 'accent', 'no'].forEach(function (c) {
+      var m = document.createElementNS(NS, 'marker'); m.setAttribute('id', id + '-head-' + c); m.setAttribute('viewBox', '0 0 10 10'); m.setAttribute('refX', '8'); m.setAttribute('refY', '5');
+      m.setAttribute('markerWidth', '4.5'); m.setAttribute('markerHeight', '4.5'); m.setAttribute('orient', 'auto-start-reverse');
+      var pth = document.createElementNS(NS, 'path'); pth.setAttribute('d', 'M0,0 L10,5 L0,10 z'); pth.setAttribute('fill', 'var(--' + c + ')');
+      m.appendChild(pth); defs.appendChild(m);
+    });
+    svg.appendChild(defs);
+    var lines = steps.map(function (s) { var pth = document.createElementNS(NS, 'path'); pth.setAttribute('class', 'arrow' + (s.lane < 0 ? ' ret' : '')); svg.appendChild(pth); return pth; });
+    steps.forEach(function (s, i) {
+      var li = document.createElement('li'); li.textContent = s.text; li.tabIndex = 0;
+      li.addEventListener('click', function () { go(i, true); }); li.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(i, true); } });
+      list.appendChild(li);
+    });
+    var geo = [];
+    function layout() {
+      var sr = stage.getBoundingClientRect();
+      geo = steps.map(function (s, i) {
+        var a = nodes[s.from].getBoundingClientRect(), b = nodes[s.to].getBoundingClientRect();
+        var A = { cx: a.left - sr.left + a.width / 2, cy: a.top - sr.top + a.height / 2, width: a.width, height: a.height };
+        var B = { cx: b.left - sr.left + b.width / 2, cy: b.top - sr.top + b.height / 2, width: b.width, height: b.height };
+        var dx = B.cx - A.cx, dy = B.cy - A.cy, len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+        // Where traffic runs both ways, each arrow keeps to the right of its direction of travel,
+        // so the two directions sit on opposite sides instead of on top of each other.
+        var twoWay = steps.some(function (o) { return o.from === s.to && o.to === s.from; });
+        var off = twoWay ? 10 : 0, nx = -dy * off, ny = dx * off;
+        var p0 = boxPoint(A, dx, dy), p1 = boxPoint(B, -dx, -dy);
+        p0 = { x: p0.x + nx, y: p0.y + ny }; p1 = { x: p1.x + nx, y: p1.y + ny };
+        lines[i].setAttribute('d', 'M' + p0.x + ',' + p0.y + ' L' + p1.x + ',' + p1.y);
+        return { p0: p0, p1: p1, nx: off ? nx / off : -dy, ny: off ? ny / off : dx };
+      });
+      paint(current, 1);
+    }
+    var current = 0, startedAt = performance.now(), playing = !reduced;
+    function paint(i, k) {
+      var s = steps[i], g = geo[i]; if (!g) return;
+      lines.forEach(function (l, j) {
+        var c = j === i ? (s.cls === 'bad' ? 'no' : 'accent') : 'line';
+        l.setAttribute('class', 'arrow' + (steps[j].lane < 0 ? ' ret' : '') + (j === i ? ' on' + (s.cls === 'bad' ? ' bad' : '') : ''));
+        l.setAttribute('marker-end', 'url(#' + id + '-head-' + c + ')');
+      });
+      var t = Math.min(1, k);
+      if (s.bounce) t = t < 0.6 ? (t / 0.6) * 0.85 : 0.85 - ((t - 0.6) / 0.4) * 0.85;
+      var e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      packet.className = 'packet ' + s.cls; packet.textContent = s.label;
+      // The label rides just beside its own arrow, then fades once it arrives so the box name stays readable.
+      var side = 16;
+      packet.style.left = (g.p0.x + (g.p1.x - g.p0.x) * e + g.nx * side) + 'px'; packet.style.top = (g.p0.y + (g.p1.y - g.p0.y) * e + g.ny * side) + 'px';
+      packet.style.opacity = reduced ? 1 : Math.max(0, Math.min(1, (1.35 - k) / 0.3));
+      var arrived = s.bounce ? k >= 0.55 : k >= 1;
+      Object.keys(nodes).forEach(function (n) {
+        nodes[n].classList.toggle('lit', arrived && n === s.lit && s.cls !== 'bad');
+        nodes[n].classList.toggle('badlit', arrived && n === s.lit && s.cls === 'bad');
+        nodes[n].classList.toggle('showbadge', arrived && n === s.badge);
+      });
+      Array.prototype.forEach.call(list.children, function (li, j) { li.classList.toggle('now', j === i); li.classList.toggle('bad', j === i && s.cls === 'bad'); });
+    }
+    function go(i, user) { current = i; startedAt = performance.now(); if (user && reduced) paint(i, 1); }
+    function tick(now) {
+      if (playing) {
+        var el = now - startedAt;
+        if (el > STEP_MS) { current = (current + 1) % steps.length; startedAt = now; el = 0; }
+        paint(current, el / MOVE_MS);
+      }
+      requestAnimationFrame(tick);
+    }
+    btn.addEventListener('click', function () { playing = !playing; btn.textContent = playing ? 'Pause' : 'Play'; if (playing) startedAt = performance.now() - MOVE_MS; });
+    if (reduced) { btn.textContent = 'Play'; }
+    new ResizeObserver(layout).observe(stage);
+    if (document.fonts) document.fonts.ready.then(layout);
+    layout();
+    requestAnimationFrame(tick);
+  }
+  setup('vetted');
+  setup('discreet');
+
+  // Shared foundation: arrows from the rulebook to both tools.
+  var found = document.getElementById('found'), fsvg = found.querySelector('svg');
+  function foundLayout() {
+    var fr = found.getBoundingClientRect(), get = function (k) { var r = found.querySelector('[data-f="' + k + '"]').getBoundingClientRect(); return { cx: r.left - fr.left + r.width / 2, cy: r.top - fr.top + r.height / 2, width: r.width, height: r.height }; };
+    var R = get('rules');
+    fsvg.innerHTML = '<defs><marker id="found-head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--accent)"/></marker></defs>';
+    ['vet', 'dis'].forEach(function (k) {
+      var T = get(k), dx = T.cx - R.cx, dy = T.cy - R.cy, len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+      var a = boxPoint(R, dx, dy), b = boxPoint(T, -dx, -dy);
+      var pth = document.createElementNS(NS, 'path'); pth.setAttribute('d', 'M' + a.x + ',' + a.y + ' L' + b.x + ',' + b.y); pth.setAttribute('marker-end', 'url(#found-head)'); fsvg.appendChild(pth);
+    });
+  }
+  new ResizeObserver(foundLayout).observe(found);
+  foundLayout();
+})();
+</script>
+</body>
+</html>
